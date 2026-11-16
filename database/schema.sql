@@ -199,6 +199,58 @@ CREATE TABLE IF NOT EXISTS announcements (
   FOREIGN KEY (author_id) REFERENCES users(id)
 ) ENGINE=InnoDB;
 
+-- ---------- CAREER & INDUSTRY DESK ----------
+CREATE TABLE IF NOT EXISTS job_openings (
+  id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  company_name VARCHAR(120) NOT NULL,
+  title VARCHAR(150) NOT NULL,
+  employment_type VARCHAR(60) NOT NULL DEFAULT 'Full Time',
+  location VARCHAR(120) NOT NULL,
+  course_codes VARCHAR(100) NULL,
+  deadline VARCHAR(60) NOT NULL,
+  skills TEXT NOT NULL,
+  description TEXT NOT NULL,
+  application_email VARCHAR(120) NOT NULL,
+  status ENUM('active','closed') NOT NULL DEFAULT 'active',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS student_projects (
+  id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  company_name VARCHAR(120) NOT NULL,
+  title VARCHAR(150) NOT NULL,
+  project_type VARCHAR(80) NOT NULL DEFAULT 'Industry Practical Lab',
+  location VARCHAR(120) NOT NULL,
+  course_codes VARCHAR(100) NULL,
+  engagement VARCHAR(60) NOT NULL,
+  skills TEXT NOT NULL,
+  description TEXT NOT NULL,
+  contact_email VARCHAR(120) NOT NULL,
+  status ENUM('open','in_progress','completed') NOT NULL DEFAULT 'open',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- ---------- VIRTUAL SESSIONS & LIVE CLASSES ----------
+CREATE TABLE IF NOT EXISTS live_classes (
+  id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  title VARCHAR(180) NOT NULL,
+  subject_id INT UNSIGNED NULL,
+  teacher_id INT UNSIGNED NULL,
+  class_id INT UNSIGNED NULL,
+  room_code VARCHAR(40) NOT NULL DEFAULT 'SEC-LAB-804',
+  meeting_url VARCHAR(255) NOT NULL,
+  scheduled_at DATETIME NOT NULL,
+  duration_minutes SMALLINT UNSIGNED NOT NULL DEFAULT 60,
+  status ENUM('live','scheduled','completed') NOT NULL DEFAULT 'scheduled',
+  presenter_name VARCHAR(120) NOT NULL DEFAULT 'Prof. Robert Miller',
+  description TEXT NULL,
+  prerequisites TEXT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE SET NULL,
+  FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE SET NULL,
+  FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
 -- Sessions stored in DB
 CREATE TABLE IF NOT EXISTS sessions (
   id VARCHAR(128) PRIMARY KEY,

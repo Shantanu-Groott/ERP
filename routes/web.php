@@ -129,6 +129,11 @@ $router->get('/student/curriculum', [\App\Controllers\Student\CourseController::
     new RoleMiddleware(['student'])
 ]);
 
+$router->get('/student/courses', [\App\Controllers\Student\CourseController::class, 'index'], [
+    AuthMiddleware::class,
+    new RoleMiddleware(['student'])
+]);
+
 $router->get('/student/notices', [\App\Controllers\Student\NoticeController::class, 'index'], [
     AuthMiddleware::class,
     new RoleMiddleware(['student'])

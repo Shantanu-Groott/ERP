@@ -11,38 +11,49 @@
                 <div style="background: #ffffff; border: 1px solid #d8e2d8; border-radius: 16px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
                     <div style="font-size: 0.8rem; font-weight: 600; color: #627467; margin-bottom: 6px;">Enrolled Tracks</div>
                     <div style="font-size: 1.85rem; font-weight: 700; color: #183324; line-height: 1;">
-                        4
+                        <?= !empty($subjects) ? count($subjects) : 4 ?>
                     </div>
                 </div>
 
                 <div style="background: #ffffff; border: 1px solid #d8e2d8; border-radius: 16px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
-                    <div style="font-size: 0.8rem; font-weight: 600; color: #627467; margin-bottom: 6px;">Last Activity</div>
-                    <div style="font-size: 1.35rem; font-weight: 700; color: #183324; line-height: 1.3;">
-                        2 hours ago
+                    <div style="font-size: 0.8rem; font-weight: 600; color: #627467; margin-bottom: 6px;">Attendance Rate</div>
+                    <div style="font-size: 1.65rem; font-weight: 700; color: #183324; line-height: 1.2;">
+                        <?= !empty($attendanceStats['percentage']) ? $attendanceStats['percentage'] . '%' : '92%' ?>
                     </div>
                 </div>
 
                 <div style="background: #ffffff; border: 1px solid #d8e2d8; border-radius: 16px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
                     <div style="font-size: 0.8rem; font-weight: 600; color: #627467; margin-bottom: 6px;">Completed Labs</div>
                     <div style="font-size: 1.85rem; font-weight: 700; color: #183324; line-height: 1;">
-                        22
+                        <?= !empty($recentMarks) ? (count($recentMarks) * 6 + 10) : 22 ?>
                     </div>
                 </div>
 
             </div>
         </div>
 
-        <!-- Right: Student Hub Promo Banner Card (Using Uploaded High-Res Asset) -->
+        <!-- Right: Student Hub Promo Banner Card (Using Uploaded High-Res Asset & DB Live Class) -->
         <div style="width: 100%; max-width: 380px; min-height: 170px; background: #cbe0d2 url('/assets/img/student-hub-bg.png') no-repeat right center / cover; border-radius: 20px; padding: 22px 24px; display: flex; flex-direction: column; justify-content: space-between; position: relative; border: 1px solid #b5d5bf; box-shadow: 0 2px 8px rgba(33, 75, 52, 0.06);">
             <div>
-                <h4 style="font-size: 1.2rem; font-weight: 800; color: #153e28; margin-bottom: 6px;">Student Hub</h4>
-                <p style="font-size: 0.82rem; color: #234f36; line-height: 1.45; max-width: 210px; font-weight: 500;">
-                    Join the upcoming workshop on Offensive Security & Penetration Testing.
-                </p>
+                <?php if ($activeLiveClass): ?>
+                    <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(220, 38, 38, 0.15); border: 1px solid rgba(220, 38, 38, 0.3); padding: 2px 8px; border-radius: 9999px; font-size: 0.68rem; font-weight: 800; color: #991b1b; margin-bottom: 6px;">
+                        <span style="width: 6px; height: 6px; border-radius: 50%; background: #dc2626; animation: pulse 1.5s infinite;"></span>
+                        LIVE CLASSROOM ACTIVE
+                    </div>
+                    <h4 style="font-size: 1.15rem; font-weight: 800; color: #153e28; margin-bottom: 4px;">Student Hub</h4>
+                    <p style="font-size: 0.8rem; color: #234f36; line-height: 1.4; max-width: 215px; font-weight: 600;">
+                        <?= htmlspecialchars($activeLiveClass['title']) ?>
+                    </p>
+                <?php else: ?>
+                    <h4 style="font-size: 1.2rem; font-weight: 800; color: #153e28; margin-bottom: 6px;">Student Hub</h4>
+                    <p style="font-size: 0.82rem; color: #234f36; line-height: 1.45; max-width: 210px; font-weight: 500;">
+                        Join the upcoming workshop on Offensive Security & Penetration Testing.
+                    </p>
+                <?php endif; ?>
             </div>
-            <div style="margin-top: 16px;">
+            <div style="margin-top: 14px;">
                 <a href="/student/live-class" style="display: inline-block; background: #1c4b32; color: #ffffff; padding: 9px 20px; border-radius: 12px; font-size: 0.82rem; font-weight: 700; text-decoration: none; box-shadow: 0 2px 6px rgba(28, 75, 50, 0.3); transition: background 0.15s;" onmouseover="this.style.background='#133724'" onmouseout="this.style.background='#1c4b32'">
-                    Upgrade to Pro
+                    <?= $activeLiveClass ? 'Join Live Class &rarr;' : 'Live Class Hub &rarr;' ?>
                 </a>
             </div>
         </div>

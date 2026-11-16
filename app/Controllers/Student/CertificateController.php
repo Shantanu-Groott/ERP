@@ -27,7 +27,7 @@ class CertificateController
             $marks = Mark::getByStudent($student['id']);
             foreach ($marks as $m) {
                 $totalObtained += (float)$m['marks_obtained'];
-                $totalMax += (float)$m['total_marks'];
+                $totalMax += (float)($m['max_marks'] ?? $m['total_marks'] ?? 100);
             }
         }
 

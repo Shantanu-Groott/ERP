@@ -10,6 +10,7 @@ use App\Models\Student;
 use App\Models\Attendance;
 use App\Models\Mark;
 use App\Models\Fee;
+use App\Core\Database;
 
 class DashboardController
 {
@@ -22,13 +23,23 @@ class DashboardController
         $recentMarks = [];
         $fees = [];
         $subjects = [];
+        $activeLiveClass = null;
+
+        $db = Database::getConnection();
+
+        // Check if an active live class exists
+        try {
+            $stmtLive = $db->query("SELECT * FROM live_classes WHERE status = 'live' ORDER BY scheduled_at DESC LIMIT 1");
+            $activeLiveClass = $stmtLive->fetch();
+        } catch (\Throwable $e) {
+            $activeLiveClass = null;
+        }
 
         if ($student) {
             $attendanceStats = Attendance::getStudentStats($student['id']);
             $recentMarks = Mark::getByStudent($student['id']);
             $fees = Fee::getByStudent($student['id']);
 
-            $db = \App\Core\Database::getConnection();
             $stmt = $db->prepare("
                 SELECT s.*, tu.full_name as instructor_name, t.designation
                 FROM teaching_assignments ta
@@ -49,6 +60,7 @@ class DashboardController
             'recentMarks' => $recentMarks,
             'fees' => $fees,
             'subjects' => $subjects,
+            'activeLiveClass' => $activeLiveClass,
         ], 'student');
     }
 }

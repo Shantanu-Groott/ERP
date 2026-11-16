@@ -32,7 +32,11 @@ INSERT INTO subjects (id, department_id, code, name, credits) VALUES
 (1, 1, 'CS301', 'Database Management Systems', 4),
 (2, 1, 'CS302', 'Computer Networks', 4),
 (3, 1, 'CS303', 'Theory of Computation', 3),
-(4, 1, 'CS304', 'Web Computing & ERP', 3)
+(4, 1, 'CS304', 'Web Computing & ERP', 3),
+(5, 1, 'CYB301', 'Network Defense Essentials', 4),
+(6, 1, 'CYB302', 'Ethical Hacking & Penetration Testing', 4),
+(7, 1, 'CYB303', 'Cryptographic & Data Security', 3),
+(8, 1, 'CYB304', 'Incident Response & Digital Forensics', 3)
 ON DUPLICATE KEY UPDATE name=VALUES(name);
 
 -- Users (admin123 hashed using password_hash('admin123', PASSWORD_BCRYPT))

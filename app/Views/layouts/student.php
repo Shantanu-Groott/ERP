@@ -201,19 +201,34 @@
         .sidebar-bottom a {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 10px 14px;
+            gap: 10px;
+            padding: 8px 12px;
             color: var(--text-muted);
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.84rem;
             font-weight: 600;
-            border-radius: 12px;
+            border-radius: 10px;
             transition: all 0.15s ease;
+        }
+
+        .sidebar-bottom a svg {
+            width: 14px;
+            height: 14px;
+            stroke-width: 2;
+            color: currentColor;
+            flex-shrink: 0;
+            opacity: 0.85;
+            transition: transform 0.15s ease;
         }
 
         .sidebar-bottom a:hover {
             color: var(--text-dark);
             background: rgba(216, 229, 216, 0.5);
+        }
+
+        .sidebar-bottom a:hover svg {
+            transform: translateX(2px);
+            opacity: 1;
         }
 
         /* Main Workspace Canvas */
@@ -435,8 +450,8 @@
 
             <!-- Bottom Settings / Logout -->
             <div class="sidebar-bottom">
-                <a href="/logout" title="Sign out" style="color: #843030;">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <a href="/logout" title="Sign out" style="color: #843030; font-size: 0.82rem;">
+                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
                     <span>Sign Out</span>
