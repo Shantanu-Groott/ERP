@@ -119,9 +119,4 @@
 
         <button type="submit" class="btn-theme-submit">Login</button>
     </form>
-
-    <div class="demo-credentials-box">
-        <strong>Demo Student Access:</strong><br>
-        • Username: <code>shantanu</code> / Password: <code>admin123</code> &rarr; <em>Student Portal</em>
-    </div>
 <?php endif; ?>

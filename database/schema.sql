@@ -4,9 +4,6 @@
 -- (MySQL 8.0+ / MariaDB 10.6+)
 -- ====================================================
 
-CREATE DATABASE IF NOT EXISTS erp CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE erp;
-
 -- ---------- AUTHENTICATION & SECURITY ----------
 CREATE TABLE IF NOT EXISTS users (
   id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
