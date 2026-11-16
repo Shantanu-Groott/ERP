@@ -5,35 +5,14 @@ namespace App\Middleware;
 
 use App\Core\Response;
 use App\Core\Session;
-use App\Core\View;
 
 final class AuthGuard
 {
-    private const REALM_ROLES = [
-        'staff'   => ['admin', 'teacher'],
-        'student' => ['student'],
-    ];
-
     private const PENDING_ALLOWED = ['/change-password', '/logout'];
 
-    public static function roleMatchesRealm(string $role, string $realm): bool
-    {
-        return in_array($role, self::REALM_ROLES[$realm] ?? [], true);
-    }
-
-    public static function enforce(Response $response, array $roles = []): bool
+    public static function enforce(Response $response): bool
     {
         if (!Session::has('user_id')) {
-            $response->redirect('/login');
-            return false;
-        }
-
-        $role  = (string)Session::get('user_role', '');
-        $realm = (string)Session::get('user_realm', '');
-
-        if (!self::roleMatchesRealm($role, $realm)) {
-            Session::invalidate();
-            Session::flash('error', 'Please sign in again.');
             $response->redirect('/login');
             return false;
         }
@@ -44,15 +23,6 @@ final class AuthGuard
                 $response->redirect('/change-password');
                 return false;
             }
-        }
-
-        if ($roles && !in_array($role, $roles, true)) {
-            $response->setStatusCode(403);
-            View::render('errors.403', [
-                'title' => '403 Forbidden',
-                'message' => 'You do not have permission to access this area.'
-            ]);
-            return false;
         }
 
         return true;

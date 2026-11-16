@@ -20,23 +20,7 @@ final class AuthService
     private const GENERIC   = 'Invalid credentials, or the account is unavailable.';
     private const THROTTLED = 'Too many attempts. Please wait a few minutes and try again.';
 
-    // The submitted realm only selects a database. It is never authorization:
-    // the role must come from that database AND be allowed for that realm.
-    private const REALM_ROLES = [
-        'staff'   => ['admin', 'teacher'],
-        'student' => ['student'],
-    ];
-    private const REALMS = [
-        'staff'   => ['table' => 'users', 'audit_col' => 'user_id'],
-        'student' => ['table' => 'users', 'audit_col' => 'user_id'],
-    ];
-
-    public static function pdo(string $realm): PDO
-    {
-        return $realm === 'staff' ? Database::staff() : Database::student();
-    }
-
-    /** @return array{success:bool, message?:string, role?:string, must_change?:bool} */
+    /** @return array{success:bool, message?:string, must_change?:bool} */
     public static function attempt(?string $realm, string $identifier, string $password, string $ip): array
     {
         $pdo   = Database::getConnection();
@@ -53,10 +37,6 @@ final class AuthService
         // so response time does not reveal whether the account exists.
         $ok = password_verify($password, $user['password_hash'] ?? self::dummyHash());
 
-        $role = $user ? (string)$user['role'] : null;
-        // Dynamically infer realm from role: 'admin' | 'teacher' => 'staff', 'student' => 'student'
-        $resolvedRealm = ($role === 'student') ? 'student' : 'staff';
-
         if (
             !$user || !$ok
             || (bool)$user['is_locked']
@@ -71,7 +51,7 @@ final class AuthService
                 )->execute(['max' => self::MAX_ACCOUNT_FAILS, 'id' => $user['id']]);
             }
             self::record($pdo, $id, $ip, false);
-            self::audit($pdo, $resolvedRealm, $user ? (int)$user['id'] : null, 'login.failed', $ip);
+            self::audit($pdo, $user ? (int)$user['id'] : null, 'login.failed', $ip);
             return ['success' => false, 'message' => self::GENERIC];
         }
 
@@ -85,22 +65,21 @@ final class AuthService
             ->execute(['id' => $user['id']]);
 
         self::record($pdo, $id, $ip, true);
-        Session::login((int)$user['id'], $resolvedRealm, $role, (bool)$user['must_change_password']);
+        Session::login((int)$user['id'], (bool)$user['must_change_password']);
         Session::set('user_name', $user['full_name']);
         Session::set('user_email', $user['email']);
         Session::set('user_username', $user['username']);
 
-        self::audit($pdo, $resolvedRealm, (int)$user['id'], 'login.success', $ip);
+        self::audit($pdo, (int)$user['id'], 'login.success', $ip);
 
-        return ['success' => true, 'role' => $role, 'must_change' => (bool)$user['must_change_password']];
+        return ['success' => true, 'must_change' => (bool)$user['must_change_password']];
     }
 
     public static function logout(string $ip): void
     {
-        $realm = (string)Session::get('user_realm', 'staff');
-        $uid   = Session::get('user_id');
+        $uid = Session::get('user_id');
         if (is_int($uid)) {
-            self::audit(Database::getConnection(), $realm, $uid, 'logout', $ip);
+            self::audit(Database::getConnection(), $uid, 'logout', $ip);
         }
         Session::invalidate();
     }
@@ -108,9 +87,8 @@ final class AuthService
     private static function findUser(PDO $pdo, string $id): ?array
     {
         $sql = 'SELECT u.id, u.full_name, u.email, u.username, u.password_hash, u.status, u.must_change_password,
-                       (u.locked_until IS NOT NULL AND u.locked_until > NOW()) AS is_locked,
-                       r.name AS role
-                  FROM users u JOIN roles r ON r.id = u.role_id
+                       (u.locked_until IS NOT NULL AND u.locked_until > NOW()) AS is_locked
+                  FROM users u
                  WHERE u.email = :a OR u.username = :b LIMIT 1';
 
         $st = $pdo->prepare($sql);
@@ -143,11 +121,10 @@ final class AuthService
         }
     }
 
-    private static function audit(PDO $pdo, string $realm, ?int $uid, string $action, string $ip): void
+    private static function audit(PDO $pdo, ?int $uid, string $action, string $ip): void
     {
         try {
-            $col = self::REALMS[$realm]['audit_col'];
-            $pdo->prepare("INSERT INTO audit_logs ({$col}, action, ip_address) VALUES (:u, :a, :ip)")
+            $pdo->prepare("INSERT INTO audit_logs (user_id, action, ip_address) VALUES (:u, :a, :ip)")
                 ->execute(['u' => $uid, 'a' => $action, 'ip' => $ip]);
         } catch (Throwable $e) {
             error_log('audit failed: ' . $e->getMessage());   // never break login because of logging

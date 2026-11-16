@@ -15,7 +15,7 @@ final class PasswordResetService
     public static function request(string $realm, string $identifier, string $ip): bool
     {
         try {
-            $pdo = AuthService::pdo($realm);
+            $pdo = Database::getConnection();
             $id = mb_strtolower(trim($identifier));
 
             $stmt = $pdo->prepare('SELECT id, email, full_name FROM users WHERE (email = :e OR username = :u) AND status = "active" LIMIT 1');
@@ -38,7 +38,7 @@ final class PasswordResetService
                 'th'  => $tokenHash
             ]);
 
-            $url = (getenv('APP_URL') ?: 'http://localhost:8001') . "/reset-password?realm={$realm}&token={$rawToken}";
+            $url = (getenv('APP_URL') ?: 'http://localhost:8001') . "/reset-password?token={$rawToken}";
             MailService::send(
                 $user['email'],
                 'Password Reset Instructions - Kalavanta Edutech',
@@ -60,7 +60,7 @@ final class PasswordResetService
         }
 
         try {
-            $pdo = AuthService::pdo($realm);
+            $pdo = Database::getConnection();
             $tokenHash = hash('sha256', $rawToken);
 
             $stmt = $pdo->prepare('

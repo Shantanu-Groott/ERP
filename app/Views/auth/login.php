@@ -121,9 +121,7 @@
     </form>
 
     <div class="demo-credentials-box">
-        <strong>Demo Accounts (Auto-Role Redirection):</strong><br>
-        • Admin: <code>admin</code> / <code>admin123</code> &rarr; <em>Admin Dashboard</em><br>
-        • Teacher: <code>prof.robert</code> / <code>admin123</code> &rarr; <em>Teacher Workspace</em><br>
-        • Student: <code>shantanu</code> / <code>admin123</code> &rarr; <em>Student Portal</em>
+        <strong>Demo Student Access:</strong><br>
+        • Username: <code>shantanu</code> / Password: <code>admin123</code> &rarr; <em>Student Portal</em>
     </div>
 <?php endif; ?>

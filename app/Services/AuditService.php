@@ -38,10 +38,9 @@ class AuditService
         try {
             $db = Database::getConnection();
             $stmt = $db->prepare("
-                SELECT a.*, u.full_name as user_name, r.name as user_role 
+                SELECT a.*, u.full_name as user_name 
                 FROM audit_logs a
                 LEFT JOIN users u ON a.user_id = u.id
-                LEFT JOIN roles r ON u.role_id = r.id
                 ORDER BY a.created_at DESC
                 LIMIT :limit
             ");

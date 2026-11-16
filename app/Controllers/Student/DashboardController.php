@@ -40,16 +40,12 @@ class DashboardController
             $recentMarks = Mark::getByStudent($student['id']);
             $fees = Fee::getByStudent($student['id']);
 
-            $stmt = $db->prepare("
-                SELECT s.*, tu.full_name as instructor_name, t.designation
-                FROM teaching_assignments ta
-                JOIN subjects s ON ta.subject_id = s.id
-                JOIN teachers t ON ta.teacher_id = t.id
-                JOIN users tu ON t.user_id = tu.id
-                WHERE ta.class_id = :class_id
+            $stmt = $db->query("
+                SELECT s.*, d.name as department_name, d.code as department_code
+                FROM subjects s
+                JOIN departments d ON s.department_id = d.id
                 ORDER BY s.code ASC
             ");
-            $stmt->execute(['class_id' => $student['class_id']]);
             $subjects = $stmt->fetchAll();
         }
 

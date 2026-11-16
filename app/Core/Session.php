@@ -64,16 +64,15 @@ final class Session
     }
 
     /** Called after successful authentication: new ID (anti-fixation) + new CSRF token. */
-    public static function login(int $userId, string $realm, string $role, bool $mustChange = false): void
+    public static function login(int $userId, mixed $arg2 = false, mixed $arg3 = null, bool $mustChange = false): void
     {
         session_regenerate_id(true);
-        $_SESSION['_must_change'] = $mustChange;   // AuthGuard locks the session to /change-password while true
-        $_SESSION['user_id']    = $userId;
-        $_SESSION['user_realm'] = $realm;      // staff | student
-        $_SESSION['user_role']  = $role;       // admin | teacher | student
-        $_SESSION['_created']   = time();
-        $_SESSION['_seen']      = time();
-        $_SESSION['_csrf']      = bin2hex(random_bytes(32));
+        $mustChangeVal = is_bool($arg2) ? $arg2 : (is_bool($arg3) ? $arg3 : $mustChange);
+        $_SESSION['_must_change'] = $mustChangeVal;
+        $_SESSION['user_id']      = $userId;
+        $_SESSION['_created']     = time();
+        $_SESSION['_seen']        = time();
+        $_SESSION['_csrf']        = bin2hex(random_bytes(32));
     }
 
     /** Destroys the session and immediately starts a clean one (so flash messages still work). */

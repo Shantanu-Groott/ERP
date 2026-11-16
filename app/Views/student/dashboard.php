@@ -36,10 +36,7 @@
         <div style="width: 100%; max-width: 380px; min-height: 170px; background: #cbe0d2 url('/assets/img/student-hub-bg.png') no-repeat right center / cover; border-radius: 20px; padding: 22px 24px; display: flex; flex-direction: column; justify-content: space-between; position: relative; border: 1px solid #b5d5bf; box-shadow: 0 2px 8px rgba(33, 75, 52, 0.06);">
             <div>
                 <?php if ($activeLiveClass): ?>
-                    <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(220, 38, 38, 0.15); border: 1px solid rgba(220, 38, 38, 0.3); padding: 2px 8px; border-radius: 9999px; font-size: 0.68rem; font-weight: 800; color: #991b1b; margin-bottom: 6px;">
-                        <span style="width: 6px; height: 6px; border-radius: 50%; background: #dc2626; animation: pulse 1.5s infinite;"></span>
-                        LIVE CLASSROOM ACTIVE
-                    </div>
+                    
                     <h4 style="font-size: 1.15rem; font-weight: 800; color: #153e28; margin-bottom: 4px;">Student Hub</h4>
                     <p style="font-size: 0.8rem; color: #234f36; line-height: 1.4; max-width: 215px; font-weight: 600;">
                         <?= htmlspecialchars($activeLiveClass['title']) ?>

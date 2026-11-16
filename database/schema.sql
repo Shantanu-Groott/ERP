@@ -1,32 +1,27 @@
--- ERP Portal schema (MySQL 8 / MariaDB 10.6+)
+-- ====================================================
+-- Kalavanta Edutech Student ERP Database Schema
+-- Dedicated Architecture for Student Portal
+-- (MySQL 8.0+ / MariaDB 10.6+)
+-- ====================================================
+
 CREATE DATABASE IF NOT EXISTS erp CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE erp;
 
--- ---------- AUTH & RBAC ----------
-CREATE TABLE IF NOT EXISTS roles (
-  id TINYINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  name VARCHAR(30) NOT NULL UNIQUE          -- admin | teacher | student
-);
-
-INSERT INTO roles (name) VALUES ('admin'), ('teacher'), ('student')
-ON DUPLICATE KEY UPDATE name=name;
-
+-- ---------- AUTHENTICATION & SECURITY ----------
 CREATE TABLE IF NOT EXISTS users (
   id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  role_id TINYINT UNSIGNED NOT NULL,
   email VARCHAR(190) NOT NULL UNIQUE,
   username VARCHAR(60) NOT NULL UNIQUE,
-  password_hash VARCHAR(255) NOT NULL,      -- password_hash(PASSWORD_ARGON2ID) or PASSWORD_DEFAULT
+  password_hash VARCHAR(255) NOT NULL,
   full_name VARCHAR(120) NOT NULL,
   phone VARCHAR(20) NULL,
   status ENUM('active','suspended','pending') NOT NULL DEFAULT 'active',
-  must_change_password TINYINT(1) NOT NULL DEFAULT 1,
+  must_change_password TINYINT(1) NOT NULL DEFAULT 0,
   failed_attempts TINYINT UNSIGNED NOT NULL DEFAULT 0,
   locked_until DATETIME NULL,
   last_login_at DATETIME NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (role_id) REFERENCES roles(id)
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS login_attempts (
@@ -42,7 +37,7 @@ CREATE TABLE IF NOT EXISTS login_attempts (
 CREATE TABLE IF NOT EXISTS password_resets (
   id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
-  token_hash CHAR(64) NOT NULL,             -- sha256 of emailed token
+  token_hash CHAR(64) NOT NULL,
   expires_at DATETIME NOT NULL,
   used_at DATETIME NULL,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -94,21 +89,12 @@ CREATE TABLE IF NOT EXISTS subjects (
   code VARCHAR(20) NOT NULL UNIQUE,
   name VARCHAR(150) NOT NULL,
   credits TINYINT UNSIGNED NOT NULL DEFAULT 3,
+  instructor_name VARCHAR(120) NOT NULL DEFAULT 'Prof. Robert Miller',
+  instructor_title VARCHAR(80) NOT NULL DEFAULT 'Lead Mentor & Faculty Lead',
   FOREIGN KEY (department_id) REFERENCES departments(id)
 ) ENGINE=InnoDB;
 
--- ---------- PROFILES ----------
-CREATE TABLE IF NOT EXISTS teachers (
-  id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  user_id INT UNSIGNED NOT NULL UNIQUE,
-  employee_code VARCHAR(30) NOT NULL UNIQUE,
-  department_id INT UNSIGNED NOT NULL,
-  designation VARCHAR(80) NULL,
-  joined_on DATE NULL,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (department_id) REFERENCES departments(id)
-) ENGINE=InnoDB;
-
+-- ---------- STUDENT PROFILES ----------
 CREATE TABLE IF NOT EXISTS students (
   id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL UNIQUE,
@@ -122,36 +108,23 @@ CREATE TABLE IF NOT EXISTS students (
   FOREIGN KEY (class_id) REFERENCES classes(id)
 ) ENGINE=InnoDB;
 
--- teacher <-> class <-> subject assignment
-CREATE TABLE IF NOT EXISTS teaching_assignments (
-  id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  teacher_id INT UNSIGNED NOT NULL,
-  class_id INT UNSIGNED NOT NULL,
-  subject_id INT UNSIGNED NOT NULL,
-  FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE,
-  FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE,
-  FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
-  UNIQUE (teacher_id, class_id, subject_id)
-) ENGINE=InnoDB;
-
--- ---------- OPERATIONS ----------
+-- ---------- STUDENT ACADEMIC OPERATIONS ----------
 CREATE TABLE IF NOT EXISTS attendance (
   id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   student_id INT UNSIGNED NOT NULL,
-  assignment_id INT UNSIGNED NOT NULL,
+  subject_id INT UNSIGNED NOT NULL,
   date DATE NOT NULL,
   status ENUM('present','absent','late','excused') NOT NULL,
-  marked_by INT UNSIGNED NOT NULL,          -- users.id
+  remarks VARCHAR(150) NULL,
   FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
-  FOREIGN KEY (assignment_id) REFERENCES teaching_assignments(id) ON DELETE CASCADE,
-  FOREIGN KEY (marked_by) REFERENCES users(id),
-  UNIQUE (student_id, assignment_id, date)
+  FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
+  UNIQUE (student_id, subject_id, date)
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS exams (
   id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   class_id INT UNSIGNED NOT NULL,
-  name VARCHAR(80) NOT NULL,                -- Midterm, Final
+  name VARCHAR(80) NOT NULL,                -- Midterm, Final, Practical
   exam_date DATE NULL,
   FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
@@ -191,12 +164,11 @@ CREATE TABLE IF NOT EXISTS fee_payments (
 
 CREATE TABLE IF NOT EXISTS announcements (
   id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  author_id INT UNSIGNED NOT NULL,
-  audience ENUM('all','teachers','students') NOT NULL DEFAULT 'all',
+  author_id INT UNSIGNED NULL,
+  audience ENUM('all','students') NOT NULL DEFAULT 'students',
   title VARCHAR(180) NOT NULL,
   body TEXT NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (author_id) REFERENCES users(id)
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
 -- ---------- CAREER & INDUSTRY DESK ----------
@@ -235,7 +207,6 @@ CREATE TABLE IF NOT EXISTS live_classes (
   id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   title VARCHAR(180) NOT NULL,
   subject_id INT UNSIGNED NULL,
-  teacher_id INT UNSIGNED NULL,
   class_id INT UNSIGNED NULL,
   room_code VARCHAR(40) NOT NULL DEFAULT 'SEC-LAB-804',
   meeting_url VARCHAR(255) NOT NULL,
@@ -247,7 +218,6 @@ CREATE TABLE IF NOT EXISTS live_classes (
   prerequisites TEXT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE SET NULL,
-  FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE SET NULL,
   FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 

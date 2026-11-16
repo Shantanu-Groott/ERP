@@ -9,18 +9,11 @@ use App\Core\Response;
 use App\Core\SecurityHeaders;
 use App\Core\Session;
 use App\Core\View;
-use App\Middleware\AuthGuard;
 use App\Services\AuthService;
 use App\Services\PasswordResetService;
 
 final class AuthController
 {
-    private const DASHBOARDS = [
-        'admin'   => '/admin/dashboard',
-        'teacher' => '/teacher/dashboard',
-        'student' => '/student/dashboard',
-    ];
-
     public function showLogin(Request $request, Response $response): void
     {
         if (Session::has('user_id')) {
@@ -80,7 +73,7 @@ final class AuthController
 
         $identifier = $this->field($request, 'identifier');
         if ($identifier !== '' && mb_strlen($identifier) <= 190) {
-            PasswordResetService::request($this->realm($request), $identifier, self::clientIp());
+            PasswordResetService::request('student', $identifier, self::clientIp());
         }
 
         $this->back($response, '/login', 'success', 'If the account exists, recovery instructions have been sent.');
@@ -93,7 +86,7 @@ final class AuthController
             $this->back($response, '/login', 'error', 'This reset link is invalid or has expired.');
             return;
         }
-        $this->render('reset', ['token' => $token, 'realm' => $this->realm($request)]);
+        $this->render('reset', ['token' => $token]);
     }
 
     public function reset(Request $request, Response $response): void
@@ -103,8 +96,7 @@ final class AuthController
         }
 
         $token = $this->field($request, 'token');
-        $realm = $this->realm($request);
-        $retry = '/reset-password?realm=' . $realm . '&token=' . rawurlencode($token);
+        $retry = '/reset-password?token=' . rawurlencode($token);
 
         if (!Csrf::verify($request->input('_csrf'))) {
             $this->back($response, '/login', 'error', 'Your session expired. Please request a new link.');
@@ -119,7 +111,7 @@ final class AuthController
             return;
         }
 
-        $result = PasswordResetService::reset($realm, $token, $password);
+        $result = PasswordResetService::reset('student', $token, $password);
         $this->back(
             $response,
             $result['success'] ? '/login' : $retry,
@@ -131,11 +123,10 @@ final class AuthController
     private function render(string $mode, array $extra = []): void
     {
         View::render('auth.login', array_merge([
-            'title'      => 'Sign In - Kalavanta Edutech ERP',
+            'title'      => 'Student Sign In - Kalavanta Edutech ERP',
             'mode'       => $mode,
             'error'      => Session::getFlash('error'),
             'success'    => Session::getFlash('success'),
-            'realm'      => Session::getFlash('realm', 'staff'),
             'identifier' => Session::getFlash('identifier', ''),
             'csrf'       => Csrf::token(),
             'nonce'      => SecurityHeaders::nonce(),
@@ -156,17 +147,7 @@ final class AuthController
             return;
         }
 
-        $role  = (string)Session::get('user_role', '');
-        $realm = (string)Session::get('user_realm', '');
-
-        if (!isset(self::DASHBOARDS[$role]) || !AuthGuard::roleMatchesRealm($role, $realm)) {
-            Session::invalidate();
-            Session::flash('error', 'Please sign in again.');
-            $response->redirect('/login');
-            return;
-        }
-
-        $response->redirect(self::DASHBOARDS[$role]);
+        $response->redirect('/student/dashboard');
     }
 
     private function requirePost(Request $request): bool
@@ -177,20 +158,6 @@ final class AuthController
         http_response_code(405);
         header('Allow: POST');
         return false;
-    }
-
-    private function realm(Request $request): string
-    {
-        $submitted = $request->input('realm');
-        if ($submitted === 'staff' || $submitted === 'student') {
-            return $submitted;
-        }
-        // Auto-detect based on identifier if provided
-        $id = strtolower(trim((string)$request->input('identifier', '')));
-        if (str_starts_with($id, 'alex') || str_starts_with($id, 'student')) {
-            return 'student';
-        }
-        return 'staff';
     }
 
     private function field(Request $request, string $key, bool $trim = true): string

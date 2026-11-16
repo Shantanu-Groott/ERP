@@ -11,18 +11,18 @@ class Attendance
     {
         $db = Database::getConnection();
         $stmt = $db->prepare("
-            INSERT INTO attendance (student_id, assignment_id, date, status, marked_by)
-            VALUES (:student_id, :assignment_id, :date, :status, :marked_by)
+            INSERT INTO attendance (student_id, subject_id, date, status, remarks)
+            VALUES (:student_id, :subject_id, :date, :status, :remarks)
             ON DUPLICATE KEY UPDATE
                 status = VALUES(status),
-                marked_by = VALUES(marked_by)
+                remarks = VALUES(remarks)
         ");
         return $stmt->execute([
             'student_id' => $data['student_id'],
-            'assignment_id' => $data['assignment_id'],
+            'subject_id' => $data['subject_id'],
             'date' => $data['date'],
             'status' => $data['status'],
-            'marked_by' => $data['marked_by'],
+            'remarks' => $data['remarks'] ?? null,
         ]);
     }
 
@@ -31,35 +31,15 @@ class Attendance
         $db = Database::getConnection();
         $stmt = $db->prepare("
             SELECT a.*, c.name as class_name, c.division, s.name as subject_name, s.code as subject_code,
-                   tu.full_name as faculty_name, t.designation as faculty_designation
+                   s.instructor_name as faculty_name, s.instructor_title as faculty_designation
             FROM attendance a
-            JOIN teaching_assignments ta ON a.assignment_id = ta.id
-            JOIN classes c ON ta.class_id = c.id
-            JOIN subjects s ON ta.subject_id = s.id
-            JOIN teachers t ON ta.teacher_id = t.id
-            JOIN users tu ON t.user_id = tu.id
+            JOIN students st ON a.student_id = st.id
+            JOIN classes c ON st.class_id = c.id
+            JOIN subjects s ON a.subject_id = s.id
             WHERE a.student_id = :student_id
             ORDER BY a.date DESC
         ");
         $stmt->execute(['student_id' => $studentId]);
-        return $stmt->fetchAll();
-    }
-
-    public static function getByAssignmentAndDate(int $assignmentId, string $date): array
-    {
-        $db = Database::getConnection();
-        $stmt = $db->prepare("
-            SELECT a.*, st.roll_no, u.full_name as student_name
-            FROM attendance a
-            JOIN students st ON a.student_id = st.id
-            JOIN users u ON st.user_id = u.id
-            WHERE a.assignment_id = :assignment_id AND a.date = :date
-            ORDER BY st.roll_no ASC
-        ");
-        $stmt->execute([
-            'assignment_id' => $assignmentId,
-            'date' => $date
-        ]);
         return $stmt->fetchAll();
     }
 
@@ -86,7 +66,7 @@ class Attendance
             'present' => $present,
             'absent' => (int)($stats['absent_days'] ?? 0),
             'late' => (int)($stats['late_days'] ?? 0),
-            'percentage' => $percentage
+            'percentage' => $percentage,
         ];
     }
 }
