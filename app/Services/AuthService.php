@@ -1,0 +1,162 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Services;
+
+use App\Core\Database;
+use App\Core\Session;
+use PDO;
+use Throwable;
+
+final class AuthService
+{
+    private const WINDOW_MIN        = 15;   // sliding window for throttling
+    private const MAX_PER_IDENTITY  = 5;    // failed tries per (identifier + IP) per window
+    private const MAX_PER_IP        = 20;   // failed tries per IP per window
+    private const MAX_ACCOUNT_FAILS = 10;   // across all IPs, then the account locks
+    private const LOCK_MIN          = 15;
+
+    // One message for every failure, so attackers learn nothing about which accounts exist
+    private const GENERIC   = 'Invalid credentials, or the account is unavailable.';
+    private const THROTTLED = 'Too many attempts. Please wait a few minutes and try again.';
+
+    // The submitted realm only selects a database. It is never authorization:
+    // the role must come from that database AND be allowed for that realm.
+    private const REALM_ROLES = [
+        'staff'   => ['admin', 'teacher'],
+        'student' => ['student'],
+    ];
+    private const REALMS = [
+        'staff'   => ['table' => 'users', 'audit_col' => 'user_id'],
+        'student' => ['table' => 'users', 'audit_col' => 'user_id'],
+    ];
+
+    public static function pdo(string $realm): PDO
+    {
+        return $realm === 'staff' ? Database::staff() : Database::student();
+    }
+
+    /** @return array{success:bool, message?:string, role?:string, must_change?:bool} */
+    public static function attempt(?string $realm, string $identifier, string $password, string $ip): array
+    {
+        $pdo   = Database::getConnection();
+        $id    = mb_strtolower(trim($identifier));
+        $table = 'users';
+
+        if (self::throttled($pdo, $id, $ip)) {
+            return ['success' => false, 'message' => self::THROTTLED];
+        }
+
+        $user = self::findUser($pdo, $id);
+
+        // Always run exactly one Argon2/Bcrypt verification, found or not,
+        // so response time does not reveal whether the account exists.
+        $ok = password_verify($password, $user['password_hash'] ?? self::dummyHash());
+
+        $role = $user ? (string)$user['role'] : null;
+        // Dynamically infer realm from role: 'admin' | 'teacher' => 'staff', 'student' => 'student'
+        $resolvedRealm = ($role === 'student') ? 'student' : 'staff';
+
+        if (
+            !$user || !$ok
+            || (bool)$user['is_locked']
+            || $user['status'] !== 'active'
+        ) {
+            if ($user && !$ok && !(bool)$user['is_locked']) {
+                $pdo->prepare(
+                    "UPDATE {$table}
+                        SET failed_attempts = failed_attempts + 1,
+                            locked_until = IF(failed_attempts >= :max, NOW() + INTERVAL " . self::LOCK_MIN . " MINUTE, locked_until)
+                      WHERE id = :id"
+                )->execute(['max' => self::MAX_ACCOUNT_FAILS, 'id' => $user['id']]);
+            }
+            self::record($pdo, $id, $ip, false);
+            self::audit($pdo, $resolvedRealm, $user ? (int)$user['id'] : null, 'login.failed', $ip);
+            return ['success' => false, 'message' => self::GENERIC];
+        }
+
+        // Upgrade the hash silently if the cost parameters have changed
+        if (password_needs_rehash($user['password_hash'], PASSWORD_ARGON2ID)) {
+            $pdo->prepare("UPDATE {$table} SET password_hash = :h WHERE id = :id")
+                ->execute(['h' => password_hash($password, PASSWORD_ARGON2ID), 'id' => $user['id']]);
+        }
+
+        $pdo->prepare("UPDATE {$table} SET failed_attempts = 0, locked_until = NULL, last_login_at = NOW() WHERE id = :id")
+            ->execute(['id' => $user['id']]);
+
+        self::record($pdo, $id, $ip, true);
+        Session::login((int)$user['id'], $resolvedRealm, $role, (bool)$user['must_change_password']);
+        Session::set('user_name', $user['full_name']);
+        Session::set('user_email', $user['email']);
+        Session::set('user_username', $user['username']);
+
+        self::audit($pdo, $resolvedRealm, (int)$user['id'], 'login.success', $ip);
+
+        return ['success' => true, 'role' => $role, 'must_change' => (bool)$user['must_change_password']];
+    }
+
+    public static function logout(string $ip): void
+    {
+        $realm = (string)Session::get('user_realm', 'staff');
+        $uid   = Session::get('user_id');
+        if (is_int($uid)) {
+            self::audit(Database::getConnection(), $realm, $uid, 'logout', $ip);
+        }
+        Session::invalidate();
+    }
+
+    private static function findUser(PDO $pdo, string $id): ?array
+    {
+        $sql = 'SELECT u.id, u.full_name, u.email, u.username, u.password_hash, u.status, u.must_change_password,
+                       (u.locked_until IS NOT NULL AND u.locked_until > NOW()) AS is_locked,
+                       r.name AS role
+                  FROM users u JOIN roles r ON r.id = u.role_id
+                 WHERE u.email = :a OR u.username = :b LIMIT 1';
+
+        $st = $pdo->prepare($sql);
+        $st->execute(['a' => $id, 'b' => $id]);
+        return $st->fetch() ?: null;
+    }
+
+    private static function throttled(PDO $pdo, string $id, string $ip): bool
+    {
+        $st = $pdo->prepare(
+            'SELECT COALESCE(SUM(identifier = :id), 0) AS by_identity, COUNT(*) AS by_ip
+               FROM login_attempts
+              WHERE ip_address = :ip AND success = 0
+                AND attempted_at > NOW() - INTERVAL ' . self::WINDOW_MIN . ' MINUTE'
+        );
+        $st->execute(['id' => mb_substr($id, 0, 190), 'ip' => $ip]);
+        $row = $st->fetch();
+
+        return (int)$row['by_identity'] >= self::MAX_PER_IDENTITY
+            || (int)$row['by_ip'] >= self::MAX_PER_IP;
+    }
+
+    private static function record(PDO $pdo, string $id, string $ip, bool $success): void
+    {
+        $pdo->prepare('INSERT INTO login_attempts (identifier, ip_address, success) VALUES (:i, :ip, :s)')
+            ->execute(['i' => mb_substr($id, 0, 190), 'ip' => $ip, 's' => (int)$success]);
+
+        if (random_int(1, 200) === 1) {   // cheap housekeeping
+            $pdo->exec('DELETE FROM login_attempts WHERE attempted_at < NOW() - INTERVAL 2 DAY');
+        }
+    }
+
+    private static function audit(PDO $pdo, string $realm, ?int $uid, string $action, string $ip): void
+    {
+        try {
+            $col = self::REALMS[$realm]['audit_col'];
+            $pdo->prepare("INSERT INTO audit_logs ({$col}, action, ip_address) VALUES (:u, :a, :ip)")
+                ->execute(['u' => $uid, 'a' => $action, 'ip' => $ip]);
+        } catch (Throwable $e) {
+            error_log('audit failed: ' . $e->getMessage());   // never break login because of logging
+        }
+    }
+
+    private static function dummyHash(): string
+    {
+        static $hash = null;
+        return $hash ??= (getenv('AUTH_DUMMY_HASH') ?: password_hash('dummy-password-not-used', PASSWORD_ARGON2ID));
+    }
+}

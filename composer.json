@@ -1,0 +1,14 @@
+{
+  "name": "groott/erp-system",
+  "description": "School / College ERP System with Modular Role-Based Architecture",
+  "type": "project",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  },
+  "require": {
+    "php": ">=8.0"
+  }
+}
