@@ -32,12 +32,19 @@
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             background-color: var(--bg-sage);
             color: var(--text-dark);
+            height: 100vh;
             min-height: 100vh;
             display: flex;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
         .font-serif {
@@ -52,22 +59,65 @@
         .portal-layout {
             display: flex;
             width: 100%;
-            min-height: 100vh;
-            padding: 12px;
-            gap: 12px;
+            height: 100vh;
+            max-height: 100vh;
+            overflow: hidden;
+            gap: 0;
         }
 
-        /* Sage Minimal Sidebar */
+        /* Sage Minimal Sidebar (Full Screen Height & Scroll-Locked) */
         .portal-sidebar {
-            width: 240px;
+            width: 250px;
+            height: 100vh;
+            max-height: 100vh;
             background: var(--sidebar-bg);
-            border-radius: 20px;
-            padding: 24px 16px;
+            margin: 0;
+            padding: 24px 16px 18px 16px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             flex-shrink: 0;
-            border: 1px solid var(--border-sage);
+            border-right: 1px solid var(--border-sage);
+            border-top: none;
+            border-bottom: none;
+            border-left: none;
+            border-radius: 0;
+            position: sticky;
+            top: 0;
+            left: 0;
+            z-index: 50;
+            overflow: hidden;
+        }
+
+        .sidebar-inner-top {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .sidebar-nav-container {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            padding-right: 4px;
+            scrollbar-width: thin;
+            scrollbar-color: #c4d4c4 transparent;
+        }
+
+        .sidebar-nav-container::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar-nav-container::-webkit-scrollbar-thumb {
+            background-color: #c4d4c4;
+            border-radius: 4px;
+        }
+
+        .sidebar-nav-container::-webkit-scrollbar-track {
+            background: transparent;
         }
 
         /* User Profile Pill at top of sidebar */
@@ -234,13 +284,28 @@
         /* Main Workspace Canvas */
         .portal-canvas {
             flex: 1;
-            background: var(--bg-surface);
-            border-radius: 20px;
-            border: 1px solid var(--border-sage);
+            height: 100vh;
+            max-height: 100vh;
+            background: var(--bg-sage);
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-            max-height: calc(100vh - 24px);
+            overscroll-behavior: contain;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5cb transparent;
+        }
+
+        .portal-canvas::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .portal-canvas::-webkit-scrollbar-thumb {
+            background-color: #cbd5cb;
+            border-radius: 4px;
+        }
+
+        .portal-canvas::-webkit-scrollbar-track {
+            background: transparent;
         }
 
         /* Canvas Top Header Row */
@@ -322,15 +387,31 @@
         @media (max-width: 1024px) {
             .portal-layout {
                 flex-direction: column;
-                padding: 8px;
+                height: auto;
+                max-height: none;
+                overflow: visible;
+                padding: 0;
             }
             .portal-sidebar {
                 width: 100%;
-                border-radius: 16px;
+                height: auto;
+                max-height: none;
+                border-radius: 0;
+                border-right: none;
+                border-bottom: 1px solid var(--border-sage);
+                position: static;
+                overflow: visible;
+            }
+            .sidebar-inner-top {
+                overflow: visible;
+            }
+            .sidebar-nav-container {
+                overflow: visible;
             }
             .portal-canvas {
-                border-radius: 16px;
+                height: auto;
                 max-height: none;
+                overflow: visible;
             }
             .canvas-topbar {
                 flex-direction: column;
@@ -346,9 +427,9 @@
 <body>
     <div class="portal-layout">
         
-        <!-- Left Sage Minimal Sidebar -->
+        <!-- Left Sage Minimal Sidebar (Full Height & Scroll-Locked) -->
         <aside class="portal-sidebar">
-            <div>
+            <div class="sidebar-inner-top">
                 <!-- User Profile Pill -->
                 <div class="user-profile-header">
                     <div class="avatar-circle">
@@ -371,82 +452,84 @@
                     <span>New Study Lab</span>
                 </a>
 
-                <!-- Navigation Links -->
-                <?php $currentUri = $_SERVER['REQUEST_URI'] ?? ''; ?>
-                <ul class="sidebar-nav-list">
-                    <li class="sidebar-nav-item <?= strpos($currentUri, '/student/dashboard') !== false ? 'active' : '' ?>">
-                        <a href="/student/dashboard">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                            </svg>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-nav-item <?= strpos($currentUri, '/student/curriculum') !== false ? 'active' : '' ?>">
-                        <a href="/student/curriculum">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                            </svg>
-                            <span>My Curriculum</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-nav-item <?= strpos($currentUri, '/student/attendance') !== false ? 'active' : '' ?>">
-                        <a href="/student/attendance">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span>Attendance Log</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-nav-item <?= strpos($currentUri, '/student/results') !== false ? 'active' : '' ?>">
-                        <a href="/student/results">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <span>Exam Grades</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-nav-item <?= strpos($currentUri, '/student/notices') !== false ? 'active' : '' ?>">
-                        <a href="/student/notices">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                            </svg>
-                            <span>Notices</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-nav-item <?= strpos($currentUri, '/student/certificate') !== false ? 'active' : '' ?>">
-                        <a href="/student/certificate">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                            </svg>
-                            <span>Certificate</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-nav-item <?= strpos($currentUri, '/student/openings') !== false ? 'active' : '' ?>">
-                        <a href="/student/openings">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                            <span>Openings</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-nav-item <?= strpos($currentUri, '/student/projects') !== false ? 'active' : '' ?>">
-                        <a href="/student/projects">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                            </svg>
-                            <span>Projects</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-nav-item <?= strpos($currentUri, '/student/live-class') !== false ? 'active' : '' ?>">
-                        <a href="/student/live-class" style="color: #b91c1c;">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                            </svg>
-                            <span>Live Lab 🔴</span>
-                        </a>
-                    </li>
-                </ul>
+                <!-- Scroll-Locked Navigation Container -->
+                <div class="sidebar-nav-container">
+                    <?php $currentUri = $_SERVER['REQUEST_URI'] ?? ''; ?>
+                    <ul class="sidebar-nav-list">
+                        <li class="sidebar-nav-item <?= strpos($currentUri, '/student/dashboard') !== false ? 'active' : '' ?>">
+                            <a href="/student/dashboard">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item <?= strpos($currentUri, '/student/curriculum') !== false ? 'active' : '' ?>">
+                            <a href="/student/curriculum">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                                </svg>
+                                <span>My Curriculum</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item <?= strpos($currentUri, '/student/attendance') !== false ? 'active' : '' ?>">
+                            <a href="/student/attendance">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <span>Attendance Log</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item <?= strpos($currentUri, '/student/results') !== false ? 'active' : '' ?>">
+                            <a href="/student/results">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <span>Exam Grades</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item <?= strpos($currentUri, '/student/notices') !== false ? 'active' : '' ?>">
+                            <a href="/student/notices">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                </svg>
+                                <span>Notices</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item <?= strpos($currentUri, '/student/certificate') !== false ? 'active' : '' ?>">
+                            <a href="/student/certificate">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                </svg>
+                                <span>Certificate</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item <?= strpos($currentUri, '/student/openings') !== false ? 'active' : '' ?>">
+                            <a href="/student/openings">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                <span>Openings</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item <?= strpos($currentUri, '/student/projects') !== false ? 'active' : '' ?>">
+                            <a href="/student/projects">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                </svg>
+                                <span>Projects</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item <?= strpos($currentUri, '/student/live-class') !== false ? 'active' : '' ?>">
+                            <a href="/student/live-class" style="color: #b91c1c;">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                <span>Live Lab 🔴</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
 
             <!-- Bottom Settings / Logout -->
