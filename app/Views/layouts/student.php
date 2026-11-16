@@ -341,7 +341,7 @@
                     </div>
                     <div>
                         <div class="user-meta-name">
-                            <?= htmlspecialchars(\App\Core\Session::get('user_name', 'Student')) ?>
+                            <?= htmlspecialchars(\App\Core\Session::get('user_name', 'Shantanu')) ?>
                         </div>
                         <div class="user-badges-row">
                             <span class="pill-tag pill-premium">Premium</span>
@@ -451,7 +451,7 @@
             <header class="canvas-topbar">
                 <div class="canvas-title-group">
                     <h1 class="font-serif">
-                        Welcome back, <?= htmlspecialchars(explode(' ', (string)\App\Core\Session::get('user_name', 'Student'))[0]) ?>!
+                        Welcome back, <?= htmlspecialchars(explode(' ', (string)\App\Core\Session::get('user_name', 'Shantanu'))[0]) ?>!
                         <span style="font-size: 1.8rem;">👋</span>
                     </h1>
                 </div>
@@ -461,7 +461,7 @@
                         <svg width="16" height="16" fill="none" stroke="#718576" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
-                        <input type="text" placeholder="Search your diagrams...">
+                        <input type="text" placeholder="Search courses, labs, modules...">
                     </div>
                     
                     <a href="/student/notices" class="icon-notification-btn" title="Notices">

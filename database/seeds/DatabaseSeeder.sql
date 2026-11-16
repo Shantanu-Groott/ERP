@@ -40,7 +40,7 @@ ON DUPLICATE KEY UPDATE name=VALUES(name);
 INSERT INTO users (id, role_id, email, username, password_hash, full_name, phone, status, must_change_password) VALUES
 (1, 1, 'admin@erp.local', 'admin', '$2y$10$Xk1feZIxXW8sRjAL/ZPyVuyyQTkN26tMPNbBHoIoRBryiU6kaIrSW', 'System Administrator', '+1 555-0100', 'active', 0),
 (2, 2, 'teacher@erp.local', 'prof.robert', '$2y$10$Xk1feZIxXW8sRjAL/ZPyVuyyQTkN26tMPNbBHoIoRBryiU6kaIrSW', 'Prof. Robert Miller', '+1 555-0101', 'active', 0),
-(3, 3, 'student@erp.local', 'alex.j', '$2y$10$Xk1feZIxXW8sRjAL/ZPyVuyyQTkN26tMPNbBHoIoRBryiU6kaIrSW', 'Alex Johnson', '+1 555-0102', 'active', 0)
+(3, 3, 'shantanu@erp.local', 'shantanu', '$2y$10$Xk1feZIxXW8sRjAL/ZPyVuyyQTkN26tMPNbBHoIoRBryiU6kaIrSW', 'Shantanu', '+1 555-0102', 'active', 0)
 ON DUPLICATE KEY UPDATE full_name=VALUES(full_name), password_hash=VALUES(password_hash);
 
 -- Teacher Profile

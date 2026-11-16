@@ -91,7 +91,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                 </span>
-                <input type="text" name="identifier" id="identifier" class="input-field" value="<?= htmlspecialchars($identifier ?? '') ?>" placeholder="e.g. admin or alex.j" required autofocus>
+                <input type="text" name="identifier" id="identifier" class="input-field" value="<?= htmlspecialchars($identifier ?? '') ?>" placeholder="e.g. admin or shantanu" required autofocus>
             </div>
         </div>
 
@@ -124,6 +124,6 @@
         <strong>Demo Accounts (Auto-Role Redirection):</strong><br>
         • Admin: <code>admin</code> / <code>admin123</code> &rarr; <em>Admin Dashboard</em><br>
         • Teacher: <code>prof.robert</code> / <code>admin123</code> &rarr; <em>Teacher Workspace</em><br>
-        • Student: <code>alex.j</code> / <code>admin123</code> &rarr; <em>Student Portal</em>
+        • Student: <code>shantanu</code> / <code>admin123</code> &rarr; <em>Student Portal</em>
     </div>
 <?php endif; ?>
