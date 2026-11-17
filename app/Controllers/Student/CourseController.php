@@ -67,8 +67,8 @@ class CourseController
             return;
         }
 
-        // Active Track - default to CYB302 or requested track
-        $track = strtoupper(trim((string)$request->input('track', 'CYB302')));
+        // Active Course - default to CYB302 or requested course
+        $track = strtoupper(trim((string)$request->input('course', $request->input('track', 'CYB302'))));
         
         $activeSubject = null;
         foreach ($subjects as $s) {
@@ -194,13 +194,14 @@ class CourseController
             ];
         }
 
-        $hasTrackParam = ($request->input('track') !== null && trim((string)$request->input('track')) !== '');
-        $initialView = $hasTrackParam ? 'modules' : 'tracks';
+        $hasParam = ($request->input('course') !== null && trim((string)$request->input('course')) !== '')
+                 || ($request->input('track') !== null && trim((string)$request->input('track')) !== '');
+        $initialView = $hasParam ? 'modules' : 'courses';
 
         View::render('student.curriculum', [
             'title' => 'Curriculum',
             'headerTitle' => 'Curriculum',
-            'headerSubtitle' => 'Explore your learning path and track your progress',
+            'headerSubtitle' => 'Explore your learning path and course progress',
             'backUrl' => '/student/dashboard',
             'searchPlaceholder' => 'Search modules...',
             'student' => $student,
@@ -210,7 +211,7 @@ class CourseController
             'selectedTrack' => $activeCode,
             'initialView' => $initialView,
             'overallProgress' => 67,
-            'enrolledTracksCount' => count($subjects),
+            'enrolledCoursesCount' => count($subjects),
             'completedLabsCount' => 46,
             'pendingLabsCount' => 12,
         ], 'student');

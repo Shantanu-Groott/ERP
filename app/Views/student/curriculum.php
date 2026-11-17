@@ -1,21 +1,18 @@
 <?php
 /**
  * Kalavanta Edutech - Student Curriculum & Course Learning Portal
- * Supports:
- *  1. Tracks List View matching official mockup
- *  2. 2x2 Course Modules View matching official mockup (media_1794914362125_ecd92b1c.jpg)
- *  3. Seamless instant switching when clicking "Continue" or "View"
+ * Clean course navigation without "tracks", with enlarged module icons (object-fit: cover; object-position: center).
  */
 $enrolledList = $enrolledCourses ?? ['CYB301', 'CYB302', 'CYB303', 'CYB304'];
-$initialView = $initialView ?? 'tracks';
-$activeTrackCode = $selectedTrack ?? 'CYB302';
+$initialView = $initialView ?? 'courses';
+$activeCourseCode = $selectedTrack ?? 'CYB302';
 ?>
 <div class="curriculum-portal-master" style="display: flex; flex-direction: column; gap: 20px;">
 
     <!-- ==================================================== -->
-    <!-- SECTION 1: ALL TRACKS LIST VIEW (Mockup 1) -->
+    <!-- SECTION 1: ALL COURSES LIST VIEW -->
     <!-- ==================================================== -->
-    <div id="tracks-view-container" style="<?= $initialView === 'modules' ? 'display: none;' : 'display: flex; flex-direction: column; gap: 20px;' ?>">
+    <div id="courses-view-container" style="<?= $initialView === 'modules' ? 'display: none;' : 'display: flex; flex-direction: column; gap: 20px;' ?>">
 
         <!-- Top Metrics Overview: Side-by-Side Cards -->
         <div class="metrics-overview-grid" style="display: grid; grid-template-columns: minmax(300px, 1fr) minmax(380px, 1.35fr); gap: 20px; align-items: stretch;">
@@ -35,7 +32,7 @@ $activeTrackCode = $selectedTrack ?? 'CYB302';
 
                 <div style="flex: 1; min-width: 0;">
                     <h3 style="font-size: 1.05rem; font-weight: 700; color: #183324; margin: 0 0 2px 0;">Overall Progress</h3>
-                    <p style="font-size: 0.82rem; color: #627467; margin: 0 0 10px 0; font-weight: 500;">Across All Tracks</p>
+                    <p style="font-size: 0.82rem; color: #627467; margin: 0 0 10px 0; font-weight: 500;">Across All Courses</p>
                     <div style="width: 140px; max-width: 100%; height: 6px; background: #e2ece4; border-radius: 999px; overflow: hidden;">
                         <div style="width: 67%; height: 100%; background: #1c4b32; border-radius: 999px;"></div>
                     </div>
@@ -46,7 +43,7 @@ $activeTrackCode = $selectedTrack ?? 'CYB302';
             <div class="curriculum-stat-card" style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 22px; padding: 22px 28px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-around;">
                 <div style="display: flex; flex-direction: column; gap: 4px; padding: 0 10px;">
                     <span style="font-size: 1.85rem; font-weight: 800; color: #183324; line-height: 1.1;">8</span>
-                    <span style="font-size: 0.82rem; font-weight: 500; color: #627467;">Enrolled Tracks</span>
+                    <span style="font-size: 0.82rem; font-weight: 500; color: #627467;">Enrolled Courses</span>
                 </div>
 
                 <div style="width: 1px; height: 44px; background: #edf2ed;"></div>
@@ -70,7 +67,7 @@ $activeTrackCode = $selectedTrack ?? 'CYB302';
         <div class="curriculum-filter-tabs" style="display: flex; align-items: center; gap: 32px; border-bottom: 1px solid #e2ece4; margin-top: 6px; padding-bottom: 0;">
             <button id="tab-all" class="filter-tab-btn active" onclick="switchCurriculumTab('all')"
                     style="background: transparent; border: none; padding: 8px 4px 12px 4px; font-size: 0.92rem; font-weight: 700; color: #183324; border-bottom: 3px solid #1c4b32; margin-bottom: -1px; cursor: pointer; font-family: inherit; transition: all 0.2s ease;">
-                All Tracks
+                All Courses
             </button>
             <button id="tab-in-progress" class="filter-tab-btn" onclick="switchCurriculumTab('in-progress')"
                     style="background: transparent; border: none; padding: 8px 4px 12px 4px; font-size: 0.92rem; font-weight: 500; color: #627467; border-bottom: 3px solid transparent; margin-bottom: -1px; cursor: pointer; font-family: inherit; transition: all 0.2s ease;">
@@ -82,8 +79,8 @@ $activeTrackCode = $selectedTrack ?? 'CYB302';
             </button>
         </div>
 
-        <!-- Main Tracks List Card -->
-        <div id="tracks-list-card" style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 22px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); overflow: hidden;">
+        <!-- Main Courses List Card -->
+        <div id="courses-list-card" style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 22px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); overflow: hidden;">
             
             <?php foreach ($allTracks as $index => $t): ?>
                 <?php 
@@ -93,13 +90,13 @@ $activeTrackCode = $selectedTrack ?? 'CYB302';
                     $statusType = ($prog === 100) ? 'completed' : (($prog > 0) ? 'in-progress' : 'not-started');
                     $isLast = ($index === count($allTracks) - 1);
                 ?>
-                <div class="track-row-wrapper" data-track-code="<?= htmlspecialchars($code) ?>" data-status="<?= $statusType ?>" data-progress="<?= $prog ?>" style="<?= !$isLast ? 'border-bottom: 1px solid #edf2ed;' : '' ?>">
+                <div class="course-row-wrapper" data-course-code="<?= htmlspecialchars($code) ?>" data-status="<?= $statusType ?>" data-progress="<?= $prog ?>" style="<?= !$isLast ? 'border-bottom: 1px solid #edf2ed;' : '' ?>">
                     
-                    <div class="track-row-item" style="padding: 18px 26px; display: flex; align-items: center; justify-content: space-between; gap: 20px; transition: background 0.15s ease;">
+                    <div class="course-row-item" style="padding: 18px 26px; display: flex; align-items: center; justify-content: space-between; gap: 20px; transition: background 0.15s ease;">
                         
-                        <!-- Left: Soft Green Icon Badge + Track Title & Subtitle -->
+                        <!-- Left: Soft Green Icon Badge + Course Title & Subtitle -->
                         <div style="display: flex; align-items: center; gap: 18px; min-width: 0; flex: 1;">
-                            <div class="track-icon-badge" style="width: 48px; height: 48px; min-width: 48px; border-radius: 14px; background: #d7e8db; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <div class="course-icon-badge" style="width: 48px; height: 48px; min-width: 48px; border-radius: 14px; background: #d7e8db; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                 <?php if ($t['icon'] === 'shield'): ?>
                                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -158,23 +155,23 @@ $activeTrackCode = $selectedTrack ?? 'CYB302';
 
                             <div style="min-width: 0;">
                                 <div style="display: flex; align-items: center; gap: 8px;">
-                                    <h4 class="track-title-text" style="font-size: 0.96rem; font-weight: 700; color: #183324; margin: 0; line-height: 1.25;">
+                                    <h4 class="course-title-text" style="font-size: 0.96rem; font-weight: 700; color: #183324; margin: 0; line-height: 1.25;">
                                         <?= htmlspecialchars($t['name']) ?>
                                     </h4>
                                     <span style="font-size: 0.7rem; font-weight: 700; color: #5a7061; background: #eaf1eb; padding: 1px 6px; border-radius: 6px;">
                                         <?= htmlspecialchars($code) ?>
                                     </span>
                                 </div>
-                                <p class="track-subtitle-text" style="font-size: 0.8rem; color: #627467; margin: 3px 0 0 0; line-height: 1.3;">
+                                <p class="course-subtitle-text" style="font-size: 0.8rem; color: #627467; margin: 3px 0 0 0; line-height: 1.3;">
                                     <?= htmlspecialchars($t['subtitle']) ?>
                                 </p>
                             </div>
                         </div>
 
-                        <!-- Right: Progress Bar + Percentage + Pill Button -->
+                        <!-- Right: Progress Bar + Percentage + Action Button -->
                         <div style="display: flex; align-items: center; gap: 24px; flex-shrink: 0;">
                             
-                            <div class="track-progress-bar-wrap" style="width: 240px; height: 6px; background: #e2ece4; border-radius: 999px; overflow: hidden;">
+                            <div class="course-progress-bar-wrap" style="width: 240px; height: 6px; background: #e2ece4; border-radius: 999px; overflow: hidden;">
                                 <div style="width: <?= $prog ?>%; height: 100%; background: #1c4b32; border-radius: 999px; transition: width 0.4s ease;"></div>
                             </div>
 
@@ -182,7 +179,7 @@ $activeTrackCode = $selectedTrack ?? 'CYB302';
                                 <?= $prog ?>%
                             </span>
 
-                            <!-- Action Pill Button: Continue for Enrolled, View for Catalog/Others -->
+                            <!-- Action Button: Continue for Enrolled, View for Catalog/Others -->
                             <?php if ($isEnrolled): ?>
                                 <button type="button" class="action-pill-btn btn-continue" onclick="showModulesView('<?= htmlspecialchars($code) ?>')" 
                                         style="padding: 7px 20px; border-radius: 999px; background: #eaf1eb; color: #1c4b32; font-weight: 600; font-size: 0.83rem; border: 1px solid #d4e2d6; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease; font-family: inherit;">
@@ -209,65 +206,47 @@ $activeTrackCode = $selectedTrack ?? 'CYB302';
     </div>
 
     <!-- ==================================================== -->
-    <!-- SECTION 2: 2x2 COURSE MODULES VIEW (Mockup 2: media_1794914362125_ecd92b1c.jpg) -->
+    <!-- SECTION 2: 2x2 COURSE MODULES VIEW (Exact Mockup Match) -->
     <!-- ==================================================== -->
     <div id="modules-view-container" style="<?= $initialView === 'modules' ? 'display: flex; flex-direction: column; gap: 20px;' : 'display: none; flex-direction: column; gap: 20px;' ?>">
         
-        <!-- Modules View Top Bar: Back Button, Title & Track Switcher -->
-        <div style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 20px; padding: 18px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 14px;">
+        <!-- Modules View Top Bar: Back Button & Course Details (Clean, no track tags/pills) -->
+        <div style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 20px; padding: 18px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
             
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                <div style="display: flex; align-items: center; gap: 14px;">
-                    <button type="button" onclick="showTracksView()" style="display: inline-flex; align-items: center; gap: 6px; background: #eaf1eb; color: #1c4b32; border: 1px solid #d4e2d6; padding: 6px 14px; border-radius: 999px; font-size: 0.82rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.15s ease;">
-                        <span>&larr;</span>
-                        <span>Back to All Tracks</span>
-                    </button>
-                    <div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span id="mv-track-code" style="background: #d7e8db; color: #1c4b32; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 6px;">
-                                CYB302
-                            </span>
-                            <h2 id="mv-track-name" class="font-serif" style="font-size: 1.25rem; font-weight: 700; color: #183324; margin: 0; line-height: 1.2;">
-                                Ethical Hacking & Pen Testing
-                            </h2>
-                        </div>
-                        <p id="mv-track-subtitle" style="font-size: 0.8rem; color: #627467; margin: 2px 0 0 0;">
-                            Learn penetration testing techniques • 4 Syllabus Modules
-                        </p>
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <button type="button" onclick="showCoursesView()" style="display: inline-flex; align-items: center; gap: 6px; background: #eaf1eb; color: #1c4b32; border: 1px solid #d4e2d6; padding: 7px 16px; border-radius: 999px; font-size: 0.82rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.15s ease;">
+                    <span>&larr;</span>
+                    <span>Back to All Courses</span>
+                </button>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span id="mv-course-code" style="background: #d7e8db; color: #1c4b32; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 6px;">
+                            CYB302
+                        </span>
+                        <h2 id="mv-course-name" class="font-serif" style="font-size: 1.25rem; font-weight: 700; color: #183324; margin: 0; line-height: 1.2;">
+                            Ethical Hacking & Pen Testing
+                        </h2>
                     </div>
-                </div>
-
-                <!-- Track Overall Progress Indicator -->
-                <div style="display: flex; align-items: center; gap: 12px; background: #f8faf8; padding: 6px 16px; border-radius: 999px; border: 1px solid #e2ece4;">
-                    <span style="font-size: 0.78rem; font-weight: 600; color: #5a7061;">Track Progress:</span>
-                    <div style="width: 100px; height: 6px; background: #e2ece4; border-radius: 999px; overflow: hidden;">
-                        <div id="mv-track-progbar" style="width: 50%; height: 100%; background: #1c4b32; border-radius: 999px; transition: width 0.4s ease;"></div>
-                    </div>
-                    <span id="mv-track-percent" style="font-size: 0.82rem; font-weight: 800; color: #183324;">50%</span>
+                    <p id="mv-course-subtitle" style="font-size: 0.8rem; color: #627467; margin: 2px 0 0 0;">
+                        Learn penetration testing techniques • 4 Syllabus Modules
+                    </p>
                 </div>
             </div>
 
-            <!-- Quick Track Selector Pills -->
-            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-top: 10px; border-top: 1px solid #edf2ed;">
-                <span style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #627467; margin-right: 4px;">
-                    Select Track:
-                </span>
-                <?php foreach ($allTracks as $trackItem): ?>
-                    <?php $tCode = $trackItem['code']; ?>
-                    <button type="button" class="mv-track-pill-btn <?= $tCode === $activeTrackCode ? 'active' : '' ?>" 
-                            data-code="<?= htmlspecialchars($tCode) ?>" 
-                            onclick="showModulesView('<?= htmlspecialchars($tCode) ?>')"
-                            style="padding: 5px 12px; border-radius: 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.15s ease; border: 1px solid; <?= $tCode === $activeTrackCode ? 'background: #1c4b32; color: #ffffff; border-color: #1c4b32;' : 'background: #f8faf8; color: #405948; border-color: #dce7df;' ?>">
-                        <?= htmlspecialchars($tCode) ?>
-                    </button>
-                <?php endforeach; ?>
+            <!-- Course Overall Progress Indicator -->
+            <div style="display: flex; align-items: center; gap: 12px; background: #f8faf8; padding: 6px 16px; border-radius: 999px; border: 1px solid #e2ece4;">
+                <span style="font-size: 0.78rem; font-weight: 600; color: #5a7061;">Course Progress:</span>
+                <div style="width: 100px; height: 6px; background: #e2ece4; border-radius: 999px; overflow: hidden;">
+                    <div id="mv-course-progbar" style="width: 50%; height: 100%; background: #1c4b32; border-radius: 999px; transition: width 0.4s ease;"></div>
+                </div>
+                <span id="mv-course-percent" style="font-size: 0.82rem; font-weight: 800; color: #183324;">50%</span>
             </div>
 
         </div>
 
-        <!-- 2x2 Grid of 4 Module Cards (Exact Match to Mockup Image media_1794914362125_ecd92b1c.jpg) -->
+        <!-- 2x2 Grid of 4 Module Cards (Enlarged Icons with object-fit: cover; object-position: center;) -->
         <div id="modules-grid-2x2" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
-            <!-- Dynamically populated or server-rendered for active track -->
+            <!-- Dynamically populated by render2x2ModulesGrid -->
         </div>
 
     </div>
@@ -284,14 +263,14 @@ $activeTrackCode = $selectedTrack ?? 'CYB302';
         <!-- Modal Top Header -->
         <div style="background: #1c4b32; color: #ffffff; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
             <div style="display: flex; align-items: center; gap: 12px;">
-                <span id="lm-track-code" style="background: rgba(255,255,255,0.2); font-size: 0.74rem; font-weight: 800; padding: 3px 8px; border-radius: 6px;">
+                <span id="lm-course-code" style="background: rgba(255,255,255,0.2); font-size: 0.74rem; font-weight: 800; padding: 3px 8px; border-radius: 6px;">
                     CYB302
                 </span>
                 <div>
                     <h3 id="lm-modal-title" style="font-size: 1.05rem; font-weight: 700; margin: 0; line-height: 1.2;">
                         Module 1: Reconnaissance & OSINT
                     </h3>
-                    <p id="lm-track-name" style="font-size: 0.78rem; color: #c4decb; margin: 2px 0 0 0;">
+                    <p id="lm-course-name" style="font-size: 0.78rem; color: #c4decb; margin: 2px 0 0 0;">
                         Ethical Hacking & Pen Testing
                     </p>
                 </div>
@@ -416,7 +395,7 @@ $activeTrackCode = $selectedTrack ?? 'CYB302';
 <!-- Data store for interactive Modules View & Learning Modal -->
 <script>
 window.__CURRICULUM_DATA__ = <?= json_encode($allTracks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
-window.__ACTIVE_TRACK_CODE__ = <?= json_encode($activeTrackCode) ?>;
+window.__ACTIVE_COURSE_CODE__ = <?= json_encode($activeCourseCode) ?>;
 </script>
 
 <style>
@@ -424,7 +403,7 @@ window.__ACTIVE_TRACK_CODE__ = <?= json_encode($activeTrackCode) ?>;
     from { opacity: 0; transform: translateY(14px) scale(0.98); }
     to { opacity: 1; transform: translateY(0) scale(1); }
 }
-.track-row-item:hover {
+.course-row-item:hover {
     background: #fafcfb;
 }
 .action-pill-btn:hover {
@@ -461,16 +440,16 @@ window.__ACTIVE_TRACK_CODE__ = <?= json_encode($activeTrackCode) ?>;
     .metrics-overview-grid {
         grid-template-columns: 1fr !important;
     }
-    .track-row-item {
+    .course-row-item {
         flex-direction: column !important;
         align-items: flex-start !important;
         gap: 14px !important;
     }
-    .track-row-item > div:last-child {
+    .course-row-item > div:last-child {
         width: 100% !important;
         justify-content: space-between !important;
     }
-    .track-progress-bar-wrap {
+    .course-progress-bar-wrap {
         width: 140px !important;
     }
 }
@@ -478,15 +457,15 @@ window.__ACTIVE_TRACK_CODE__ = <?= json_encode($activeTrackCode) ?>;
 
 <script>
 // ==========================================
-// VIEW SWITCHING: Tracks List <-> 2x2 Modules
+// VIEW SWITCHING: Courses List <-> 2x2 Modules
 // ==========================================
 
-function showTracksView() {
+function showCoursesView() {
     document.getElementById('modules-view-container').style.display = 'none';
-    const tracksContainer = document.getElementById('tracks-view-container');
-    tracksContainer.style.display = 'flex';
-    tracksContainer.style.flexDirection = 'column';
-    tracksContainer.style.gap = '20px';
+    const coursesContainer = document.getElementById('courses-view-container');
+    coursesContainer.style.display = 'flex';
+    coursesContainer.style.flexDirection = 'column';
+    coursesContainer.style.gap = '20px';
     
     // Update browser URL cleanly
     try {
@@ -495,39 +474,26 @@ function showTracksView() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function showModulesView(trackCode) {
-    const track = window.__CURRICULUM_DATA__.find(t => t.code === trackCode);
-    if (!track) return;
+function showModulesView(courseCode) {
+    const course = window.__CURRICULUM_DATA__.find(t => t.code === courseCode);
+    if (!course) return;
 
-    window.__ACTIVE_TRACK_CODE__ = trackCode;
+    window.__ACTIVE_COURSE_CODE__ = courseCode;
 
     // Update Topbar Info in Modules View
-    document.getElementById('mv-track-code').textContent = track.code;
-    document.getElementById('mv-track-name').textContent = track.name;
-    document.getElementById('mv-track-subtitle').textContent = track.subtitle + ' • 4 Syllabus Modules';
+    document.getElementById('mv-course-code').textContent = course.code;
+    document.getElementById('mv-course-name').textContent = course.name;
+    document.getElementById('mv-course-subtitle').textContent = course.subtitle + ' • 4 Syllabus Modules';
     
-    const prog = track.display_progress !== undefined ? track.display_progress : track.progress;
-    document.getElementById('mv-track-progbar').style.width = prog + '%';
-    document.getElementById('mv-track-percent').textContent = prog + '%';
+    const prog = course.display_progress !== undefined ? course.display_progress : course.progress;
+    document.getElementById('mv-course-progbar').style.width = prog + '%';
+    document.getElementById('mv-course-percent').textContent = prog + '%';
 
-    // Update track selector pills active state
-    document.querySelectorAll('.mv-track-pill-btn').forEach(btn => {
-        if (btn.getAttribute('data-code') === trackCode) {
-            btn.style.background = '#1c4b32';
-            btn.style.color = '#ffffff';
-            btn.style.borderColor = '#1c4b32';
-        } else {
-            btn.style.background = '#f8faf8';
-            btn.style.color = '#405948';
-            btn.style.borderColor = '#dce7df';
-        }
-    });
-
-    // Render the 4 Module Cards in 2x2 Grid matching mockup
-    render2x2ModulesGrid(track);
+    // Render the 4 Module Cards in 2x2 Grid with enlarged icons (object-fit: cover; object-position: center;)
+    render2x2ModulesGrid(course);
 
     // Switch view containers
-    document.getElementById('tracks-view-container').style.display = 'none';
+    document.getElementById('courses-view-container').style.display = 'none';
     const modulesContainer = document.getElementById('modules-view-container');
     modulesContainer.style.display = 'flex';
     modulesContainer.style.flexDirection = 'column';
@@ -535,15 +501,15 @@ function showModulesView(trackCode) {
 
     // Update browser URL cleanly
     try {
-        history.pushState(null, '', '/student/curriculum?track=' + encodeURIComponent(trackCode));
+        history.pushState(null, '', '/student/curriculum?course=' + encodeURIComponent(courseCode));
     } catch(e) {}
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function render2x2ModulesGrid(track) {
+function render2x2ModulesGrid(course) {
     const container = document.getElementById('modules-grid-2x2');
     container.innerHTML = '';
-    const modules = track.modules || [];
+    const modules = course.modules || [];
 
     modules.forEach((mod) => {
         const modNum = mod.number || 1;
@@ -588,7 +554,7 @@ function render2x2ModulesGrid(track) {
             </div>
         `;
 
-        // Body: Left Illustration Box + Right Lessons Checklist
+        // Body: Left Illustration Box (Enlarged to 135x135 with object-fit: cover; object-position: center;) + Right Lessons Checklist
         let lessonsHtml = '';
         lessons.forEach(l => {
             const isCompleted = (l.status === 'completed');
@@ -629,12 +595,13 @@ function render2x2ModulesGrid(track) {
             `;
         });
 
+        // Enlarged icon container (135px x 135px) with object-fit: cover; object-position: center;
         let bodyHtml = `
-            <div style="display: flex; align-items: center; gap: 18px; margin: 12px 0;">
-                <div style="width: 110px; height: 110px; min-width: 110px; border-radius: 16px; background: #f2f7f3; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <img src="${modImage}" alt="${escapeHtml(modTitle)}" style="max-width: 90px; max-height: 90px; object-fit: contain;">
+            <div style="display: flex; align-items: center; gap: 20px; margin: 12px 0;">
+                <div style="width: 135px; height: 135px; min-width: 135px; border-radius: 18px; background: #f2f7f3; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                    <img src="${modImage}" alt="${escapeHtml(modTitle)}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; border-radius: 18px;">
                 </div>
-                <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 9px;">
+                <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px;">
                     ${lessonsHtml}
                 </div>
             </div>
@@ -643,7 +610,7 @@ function render2x2ModulesGrid(track) {
         // Footer: Dark Green Pill Button matching mockup
         let footerHtml = `
             <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: auto; padding-top: 4px;">
-                <button type="button" class="module-btn-action" onclick="openLearningModal('${track.code}', ${modNum})"
+                <button type="button" class="module-btn-action" onclick="openLearningModal('${course.code}', ${modNum})"
                         style="background: #1c4b32; color: #ffffff; border: none; border-radius: 999px; padding: 8px 26px; font-weight: 600; font-size: 0.84rem; cursor: pointer; transition: all 0.15s ease; font-family: inherit;">
                     ${escapeHtml(btnText)}
                 </button>
@@ -663,7 +630,7 @@ function escapeHtml(str) {
 }
 
 // ==========================================
-// FILTER TABS SWITCHING (Tracks List)
+// FILTER TABS SWITCHING (Courses List)
 // ==========================================
 function switchCurriculumTab(tabType) {
     document.querySelectorAll('.filter-tab-btn').forEach(btn => {
@@ -681,7 +648,7 @@ function switchCurriculumTab(tabType) {
         activeBtn.style.borderBottomColor = '#1c4b32';
     }
 
-    const rows = document.querySelectorAll('.track-row-wrapper');
+    const rows = document.querySelectorAll('.course-row-wrapper');
     rows.forEach(row => {
         const status = row.getAttribute('data-status');
         if (tabType === 'all') {
@@ -697,22 +664,22 @@ function switchCurriculumTab(tabType) {
 // ==========================================
 // INTERACTIVE LEARNING MODAL
 // ==========================================
-let currentModalTrack = null;
+let currentModalCourse = null;
 let currentModalModule = null;
 let currentModalLessonIdx = 0;
 
-function openLearningModal(trackCode, moduleNumber) {
-    const track = window.__CURRICULUM_DATA__.find(t => t.code === trackCode);
-    if (!track) return;
-    const mod = (track.modules || []).find(m => m.number == moduleNumber) || track.modules[0];
+function openLearningModal(courseCode, moduleNumber) {
+    const course = window.__CURRICULUM_DATA__.find(t => t.code === courseCode);
+    if (!course) return;
+    const mod = (course.modules || []).find(m => m.number == moduleNumber) || course.modules[0];
     if (!mod) return;
 
-    currentModalTrack = track;
+    currentModalCourse = course;
     currentModalModule = mod;
     currentModalLessonIdx = 0;
 
-    document.getElementById('lm-track-code').textContent = track.code;
-    document.getElementById('lm-track-name').textContent = track.name;
+    document.getElementById('lm-course-code').textContent = course.code;
+    document.getElementById('lm-course-name').textContent = course.name;
     document.getElementById('lm-modal-title').textContent = mod.title;
 
     renderModalLessonsSidebar();
@@ -828,7 +795,7 @@ function toggleLessonComplete() {
 }
 
 function launchVirtualLabDemo() {
-    alert('Launching sandbox instance for ' + currentModalTrack.name + ' (' + currentModalTrack.code + ')...\nVirtual Terminal Container active on port 4200.');
+    alert('Launching sandbox instance for ' + currentModalCourse.name + ' (' + currentModalCourse.code + ')...\nVirtual Terminal Container active on port 4200.');
 }
 
 // ==========================================
@@ -836,10 +803,10 @@ function launchVirtualLabDemo() {
 // ==========================================
 document.addEventListener('DOMContentLoaded', function() {
     // Initial render of 2x2 grid if modules view is requested
-    const initialTrackCode = window.__ACTIVE_TRACK_CODE__ || 'CYB302';
-    const track = window.__CURRICULUM_DATA__.find(t => t.code === initialTrackCode);
-    if (track) {
-        render2x2ModulesGrid(track);
+    const initialCourseCode = window.__ACTIVE_COURSE_CODE__ || 'CYB302';
+    const course = window.__CURRICULUM_DATA__.find(t => t.code === initialCourseCode);
+    if (course) {
+        render2x2ModulesGrid(course);
     }
 
     // Topbar live search integration
@@ -848,16 +815,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     searchInput.addEventListener('input', function(e) {
         const query = e.target.value.toLowerCase().trim();
-        const rows = document.querySelectorAll('.track-row-wrapper');
+        const rows = document.querySelectorAll('.course-row-wrapper');
 
         rows.forEach(row => {
             if (!query) {
                 row.style.display = 'block';
                 return;
             }
-            const code = (row.getAttribute('data-track-code') || '').toLowerCase();
-            const title = (row.querySelector('.track-title-text')?.textContent || '').toLowerCase();
-            const subtitle = (row.querySelector('.track-subtitle-text')?.textContent || '').toLowerCase();
+            const code = (row.getAttribute('data-course-code') || '').toLowerCase();
+            const title = (row.querySelector('.course-title-text')?.textContent || '').toLowerCase();
+            const subtitle = (row.querySelector('.course-subtitle-text')?.textContent || '').toLowerCase();
 
             if (code.includes(query) || title.includes(query) || subtitle.includes(query)) {
                 row.style.display = 'block';
