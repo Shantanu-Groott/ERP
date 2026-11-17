@@ -24,6 +24,9 @@ final class Session
         ini_set('session.sid_bits_per_character', '6');
 
         $path = dirname(__DIR__, 2) . '/storage/sessions';
+        if (!is_dir($path)) {
+            @mkdir($path, 0755, true);
+        }
         if (is_dir($path) && is_writable($path)) {
             session_save_path($path);                 // keep out of shared /tmp (chmod 0700)
         }

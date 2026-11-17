@@ -28,6 +28,9 @@ class MailService
 
         // If local development or SMTP without extension, record to log
         $logPath = dirname(dirname(__DIR__)) . '/storage/logs/mail.log';
+        if (!is_dir(dirname($logPath))) {
+            @mkdir(dirname($logPath), 0755, true);
+        }
         $logEntry = sprintf(
             "[%s] TO: %s | SUBJECT: %s\nBODY:\n%s\n----------------------------------------\n",
             date('Y-m-d H:i:s'),

@@ -27,6 +27,9 @@ class AuditService
             ]);
         } catch (\Exception $e) {
             $logFile = dirname(dirname(__DIR__)) . '/storage/logs/audit.log';
+            if (!is_dir(dirname($logFile))) {
+                @mkdir(dirname($logFile), 0755, true);
+            }
             $entry = sprintf("[%s] USER:%s ACTION:%s ENTITY:%s ID:%s IP:%s\n", 
                 date('Y-m-d H:i:s'), $userId ?? 'GUEST', $action, $entity ?? 'none', $entityId ?? 'none', $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
             @file_put_contents($logFile, $entry, FILE_APPEND);
