@@ -55,6 +55,15 @@ final class AuthController
 
     public function logout(Request $request, Response $response): void
     {
+        if (!$this->requirePost($request)) {
+            return;
+        }
+
+        if (!Csrf::verify($request->input('_csrf'))) {
+            $this->back($response, '/login', 'error', 'Invalid or expired CSRF token.');
+            return;
+        }
+
         AuthService::logout(self::clientIp());
         $this->back($response, '/login', 'success', 'You have been signed out.');
     }

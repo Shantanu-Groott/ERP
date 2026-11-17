@@ -545,12 +545,15 @@
                     <span>Settings</span>
                 </a>
 
-                <a href="/logout" title="Sign out" style="display: inline-flex; align-items: center; gap: 5px; color: #843030; text-decoration: none; font-size: 0.76rem; font-weight: 600; padding: 4px 8px; border-radius: 6px; background: rgba(132, 48, 48, 0.08);">
-                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    <span>Exit</span>
-                </a>
+                <form action="/logout" method="POST" style="margin: 0; padding: 0; display: inline;">
+                    <?= \App\Core\Csrf::field() ?>
+                    <button type="submit" title="Sign out" style="display: inline-flex; align-items: center; gap: 5px; color: #843030; text-decoration: none; font-size: 0.76rem; font-weight: 600; padding: 4px 8px; border-radius: 6px; background: rgba(132, 48, 48, 0.08); border: none; cursor: pointer; font-family: inherit;">
+                        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        <span>Exit</span>
+                    </button>
+                </form>
             </div>
         </aside>
 

@@ -42,16 +42,27 @@ final class AuthService
             || (bool)$user['is_locked']
             || $user['status'] !== 'active'
         ) {
-            if ($user && !$ok && !(bool)$user['is_locked']) {
-                $pdo->prepare(
-                    "UPDATE {$table}
-                        SET failed_attempts = failed_attempts + 1,
-                            locked_until = IF(failed_attempts >= :max, NOW() + INTERVAL " . self::LOCK_MIN . " MINUTE, locked_until)
-                      WHERE id = :id"
-                )->execute(['max' => self::MAX_ACCOUNT_FAILS, 'id' => $user['id']]);
+            if ($user && !(bool)$user['is_locked']) {
+                // If previous lockout expired, restart counter from 1; otherwise increment and lock when threshold reached
+                $hasExpiredLock = (!empty($user['locked_until']) && strtotime((string)$user['locked_until']) <= time());
+                if ($hasExpiredLock) {
+                    $pdo->prepare("UPDATE {$table} SET failed_attempts = 1, locked_until = NULL WHERE id = :id")
+                        ->execute(['id' => $user['id']]);
+                } else {
+                    $stmtLock = $pdo->prepare(
+                        "UPDATE {$table}
+                            SET failed_attempts = failed_attempts + 1,
+                                locked_until = CASE
+                                    WHEN failed_attempts >= :max THEN DATE_ADD(NOW(), INTERVAL " . self::LOCK_MIN . " MINUTE)
+                                    ELSE locked_until
+                                END
+                          WHERE id = :id"
+                    );
+                    $stmtLock->execute(['max' => self::MAX_ACCOUNT_FAILS, 'id' => $user['id']]);
+                }
             }
             self::record($pdo, $id, $ip, false);
-            self::audit($pdo, $user ? (int)$user['id'] : null, 'login.failed', $ip);
+            AuditService::log($user ? (int)$user['id'] : null, 'login.failed', 'auth', $user ? (int)$user['id'] : null, ['ip' => $ip]);
             return ['success' => false, 'message' => self::GENERIC];
         }
 
@@ -70,7 +81,7 @@ final class AuthService
         Session::set('user_email', $user['email']);
         Session::set('user_username', $user['username']);
 
-        self::audit($pdo, (int)$user['id'], 'login.success', $ip);
+        AuditService::log((int)$user['id'], 'login.success', 'auth', (int)$user['id'], ['ip' => $ip]);
 
         return ['success' => true, 'must_change' => (bool)$user['must_change_password']];
     }
@@ -79,56 +90,63 @@ final class AuthService
     {
         $uid = Session::get('user_id');
         if (is_int($uid)) {
-            self::audit(Database::getConnection(), $uid, 'logout', $ip);
+            AuditService::log($uid, 'logout', 'auth', $uid, ['ip' => $ip]);
         }
         Session::invalidate();
+    }
+
+    private static function hashIdentifier(string $id): string
+    {
+        $key = getenv('APP_KEY') ?: 'kalavanta_erp_hmac_secret_2026';
+        return hash_hmac('sha256', mb_strtolower(trim($id)), $key);
     }
 
     private static function findUser(PDO $pdo, string $id): ?array
     {
         $sql = 'SELECT u.id, u.full_name, u.email, u.username, u.password_hash, u.status, u.must_change_password,
+                       u.failed_attempts, u.locked_until,
                        (u.locked_until IS NOT NULL AND u.locked_until > NOW()) AS is_locked
                   FROM users u
-                 WHERE u.email = :a OR u.username = :b LIMIT 1';
+             LEFT JOIN students s ON s.user_id = u.id
+                 WHERE u.email = :a OR u.username = :b OR s.roll_no = :c LIMIT 1';
 
         $st = $pdo->prepare($sql);
-        $st->execute(['a' => $id, 'b' => $id]);
+        $st->execute(['a' => $id, 'b' => $id, 'c' => $id]);
         return $st->fetch() ?: null;
     }
 
     private static function throttled(PDO $pdo, string $id, string $ip): bool
     {
+        $idHash = self::hashIdentifier($id);
         $st = $pdo->prepare(
-            'SELECT COALESCE(SUM(identifier = :id), 0) AS by_identity, COUNT(*) AS by_ip
+            'SELECT COALESCE(SUM(identifier = :idHash), 0) AS by_identity,
+                    COUNT(*) AS by_ip
                FROM login_attempts
               WHERE ip_address = :ip AND success = 0
                 AND attempted_at > NOW() - INTERVAL ' . self::WINDOW_MIN . ' MINUTE'
         );
-        $st->execute(['id' => mb_substr($id, 0, 190), 'ip' => $ip]);
+        $st->execute(['idHash' => $idHash, 'ip' => $ip]);
         $row = $st->fetch();
 
-        return (int)$row['by_identity'] >= self::MAX_PER_IDENTITY
-            || (int)$row['by_ip'] >= self::MAX_PER_IP;
+        return (int)($row['by_identity'] ?? 0) >= self::MAX_PER_IDENTITY
+            || (int)($row['by_ip'] ?? 0) >= self::MAX_PER_IP;
     }
 
     private static function record(PDO $pdo, string $id, string $ip, bool $success): void
     {
+        $idHash = self::hashIdentifier($id);
         $pdo->prepare('INSERT INTO login_attempts (identifier, ip_address, success) VALUES (:i, :ip, :s)')
-            ->execute(['i' => mb_substr($id, 0, 190), 'ip' => $ip, 's' => (int)$success]);
+            ->execute(['i' => $idHash, 'ip' => $ip, 's' => (int)$success]);
 
-        if (random_int(1, 200) === 1) {   // cheap housekeeping
-            $pdo->exec('DELETE FROM login_attempts WHERE attempted_at < NOW() - INTERVAL 2 DAY');
+        // Minimize retention to 1 hour to reduce stored attempt metadata
+        if (random_int(1, 100) === 1) {
+            $pdo->exec('DELETE FROM login_attempts WHERE attempted_at < NOW() - INTERVAL 1 HOUR');
         }
     }
 
     private static function audit(PDO $pdo, ?int $uid, string $action, string $ip): void
     {
-        try {
-            $pdo->prepare("INSERT INTO audit_logs (user_id, action, ip_address) VALUES (:u, :a, :ip)")
-                ->execute(['u' => $uid, 'a' => $action, 'ip' => $ip]);
-        } catch (Throwable $e) {
-            error_log('audit failed: ' . $e->getMessage());   // never break login because of logging
-        }
+        AuditService::log($uid, $action, 'auth', $uid, ['ip' => $ip]);
     }
 
     private static function dummyHash(): string

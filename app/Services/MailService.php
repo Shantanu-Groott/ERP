@@ -26,19 +26,24 @@ class MailService
             'X-Mailer: PHP/' . phpversion()
         ];
 
-        // If local development or SMTP without extension, record to log
-        $logPath = dirname(dirname(__DIR__)) . '/storage/logs/mail.log';
-        if (!is_dir(dirname($logPath))) {
-            @mkdir(dirname($logPath), 0755, true);
+        // Record sanitized delivery metadata to log (Tokens, URLs, and email bodies are excluded for security)
+        $logDir = dirname(dirname(__DIR__)) . '/storage/logs';
+        if (!is_dir($logDir)) {
+            @mkdir($logDir, 0700, true);
         }
+        $logPath = $logDir . '/mail.log';
+        $sanitizedSubject = preg_replace('/(token|code|key|secret)[=:\s]+[a-zA-Z0-9_\-\.]{8,}/i', '$1=[REDACTED]', strip_tags($subject));
+        $sanitizedSubject = preg_replace('/https?:\/\/\S+/i', '[REDACTED_URL]', $sanitizedSubject);
         $logEntry = sprintf(
-            "[%s] TO: %s | SUBJECT: %s\nBODY:\n%s\n----------------------------------------\n",
+            "[%s] DISPATCHED | TO: %s | SUBJECT: %s\n",
             date('Y-m-d H:i:s'),
-            $to,
-            $subject,
-            $body
+            filter_var($to, FILTER_SANITIZE_EMAIL),
+            $sanitizedSubject
         );
         @file_put_contents($logPath, $logEntry, FILE_APPEND);
+        if (file_exists($logPath)) {
+            @chmod($logPath, 0600);
+        }
 
         // Native PHP mail fallback
         if (!empty($instance->config['host']) && $instance->config['mailer'] === 'native') {

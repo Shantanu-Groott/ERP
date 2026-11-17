@@ -63,27 +63,37 @@ final class PasswordResetService
             $pdo = Database::getConnection();
             $tokenHash = hash('sha256', $rawToken);
 
+            // Start transaction before reading token to acquire pessimistic row lock
+            $pdo->beginTransaction();
+
             $stmt = $pdo->prepare('
                 SELECT pr.id, pr.user_id 
                 FROM password_resets pr
                 WHERE pr.token_hash = :th AND pr.used_at IS NULL AND pr.expires_at > NOW()
                 LIMIT 1
+                FOR UPDATE
             ');
             $stmt->execute(['th' => $tokenHash]);
             $reset = $stmt->fetch();
 
             if (!$reset) {
+                $pdo->rollBack();
                 return ['success' => false, 'message' => 'This reset link is invalid or has expired.'];
             }
 
+            // Atomically mark token as consumed and ensure exactly 1 row was updated
+            $upToken = $pdo->prepare('UPDATE password_resets SET used_at = NOW() WHERE id = :id AND used_at IS NULL');
+            $upToken->execute(['id' => $reset['id']]);
+
+            if ($upToken->rowCount() !== 1) {
+                $pdo->rollBack();
+                return ['success' => false, 'message' => 'This reset link has already been used.'];
+            }
+
             $hash = password_hash($newPassword, PASSWORD_ARGON2ID);
-            
-            $pdo->beginTransaction();
             $upUser = $pdo->prepare('UPDATE users SET password_hash = :h, must_change_password = 0, failed_attempts = 0, locked_until = NULL WHERE id = :uid');
             $upUser->execute(['h' => $hash, 'uid' => $reset['user_id']]);
 
-            $upToken = $pdo->prepare('UPDATE password_resets SET used_at = NOW() WHERE id = :id');
-            $upToken->execute(['id' => $reset['id']]);
             $pdo->commit();
 
             return ['success' => true, 'message' => 'Password successfully updated. You may now sign in.'];

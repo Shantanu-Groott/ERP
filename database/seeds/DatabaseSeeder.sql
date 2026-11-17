@@ -33,10 +33,10 @@ INSERT INTO subjects (id, department_id, code, name, credits, instructor_name, i
 (8, 1, 'CYB304', 'Incident Response & Digital Forensics', 3, 'Prof. Robert Miller', 'Lead Mentor - Cybersecurity')
 ON DUPLICATE KEY UPDATE name=VALUES(name), instructor_name=VALUES(instructor_name);
 
--- Student User: Shantanu (password: admin123)
+-- Student User: Shantanu (initial bootstrap profile; requires password reset/change on initial activation)
 INSERT INTO users (id, email, username, password_hash, full_name, phone, status, must_change_password) VALUES
-(3, 'shantanu@erp.local', 'shantanu', '$2y$10$Xk1feZIxXW8sRjAL/ZPyVuyyQTkN26tMPNbBHoIoRBryiU6kaIrSW', 'Shantanu', '+1 555-0102', 'active', 0)
-ON DUPLICATE KEY UPDATE full_name=VALUES(full_name), password_hash=VALUES(password_hash);
+(3, 'shantanu@erp.local', 'shantanu', '$2y$10$Xk1feZIxXW8sRjAL/ZPyVuyyQTkN26tMPNbBHoIoRBryiU6kaIrSW', 'Shantanu', '+1 555-0102', 'active', 1)
+ON DUPLICATE KEY UPDATE full_name=VALUES(full_name), must_change_password=VALUES(must_change_password);
 
 -- Student Profile
 INSERT INTO students (id, user_id, roll_no, class_id, dob, guardian_name, guardian_phone, admitted_on) VALUES

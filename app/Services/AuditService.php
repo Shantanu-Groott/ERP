@@ -9,9 +9,9 @@ class AuditService
 {
     public static function log(?int $userId, string $action, ?string $entity = null, ?int $entityId = null, ?array $meta = null): void
     {
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         try {
             $db = Database::getConnection();
-            $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
             
             $stmt = $db->prepare("
                 INSERT INTO audit_logs (user_id, action, entity, entity_id, meta, ip_address, created_at)
@@ -25,14 +25,25 @@ class AuditService
                 'meta' => $meta ? json_encode($meta) : null,
                 'ip_address' => $ip,
             ]);
-        } catch (\Exception $e) {
-            $logFile = dirname(dirname(__DIR__)) . '/storage/logs/audit.log';
-            if (!is_dir(dirname($logFile))) {
-                @mkdir(dirname($logFile), 0755, true);
+        } catch (\Throwable $e) {
+            // Protected local fallback sink with restricted permissions
+            $logDir = dirname(dirname(__DIR__)) . '/storage/logs';
+            if (!is_dir($logDir)) {
+                @mkdir($logDir, 0700, true);
             }
+            $logFile = $logDir . '/audit.log';
             $entry = sprintf("[%s] USER:%s ACTION:%s ENTITY:%s ID:%s IP:%s\n", 
-                date('Y-m-d H:i:s'), $userId ?? 'GUEST', $action, $entity ?? 'none', $entityId ?? 'none', $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
-            @file_put_contents($logFile, $entry, FILE_APPEND);
+                date('Y-m-d H:i:s'), $userId ?? 'GUEST', $action, $entity ?? 'none', $entityId ?? 'none', $ip);
+            
+            $written = @file_put_contents($logFile, $entry, FILE_APPEND);
+            if (file_exists($logFile)) {
+                @chmod($logFile, 0600);
+            }
+
+            // If local fallback write also fails, emit an operational alert without leaking raw DB/system exceptions
+            if ($written === false) {
+                error_log(sprintf('[SECURITY_ALERT] Audit logging failed to record action "%s" for user "%s".', $action, $userId ?? 'GUEST'));
+            }
         }
     }
 
@@ -50,7 +61,7 @@ class AuditService
             $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
             $stmt->execute();
             return $stmt->fetchAll();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return [];
         }
     }
