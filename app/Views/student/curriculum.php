@@ -1,347 +1,274 @@
 <?php
 /**
- * Kalavanta Edutech - Student Curriculum & Learning Paths
- * Adapted to List-Based Track View matching official mockup
+ * Kalavanta Edutech - Student Curriculum & Course Learning Portal
+ * Supports:
+ *  1. Tracks List View matching official mockup
+ *  2. 2x2 Course Modules View matching official mockup (media_1794914362125_ecd92b1c.jpg)
+ *  3. Seamless instant switching when clicking "Continue" or "View"
  */
-$enrolledList = $enrolledCourses ?? ['CYB301', 'CYB302', 'CYB303', 'CYB304', 'CS301', 'CS302', 'CS303', 'CS304'];
+$enrolledList = $enrolledCourses ?? ['CYB301', 'CYB302', 'CYB303', 'CYB304'];
+$initialView = $initialView ?? 'tracks';
+$activeTrackCode = $selectedTrack ?? 'CYB302';
 ?>
-<div class="curriculum-portal-container" style="display: flex; flex-direction: column; gap: 20px;">
+<div class="curriculum-portal-master" style="display: flex; flex-direction: column; gap: 20px;">
 
-    <!-- Instant Unlock Notification Alert -->
-    <?php if (!empty($_GET['unlocked'])): ?>
-        <div style="background: #e6f4ea; border: 1px solid #a8dab5; border-radius: 16px; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 14px; box-shadow: 0 2px 8px rgba(28, 75, 50, 0.08);">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="width: 32px; height: 32px; border-radius: 50%; background: #2d6a4f; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem;">✓</span>
-                <div>
-                    <h4 style="font-size: 0.92rem; font-weight: 700; color: #153e28; margin: 0 0 2px 0;">Track Successfully Unlocked!</h4>
-                    <p style="font-size: 0.78rem; color: #375943; margin: 0;">You have full enrolled access to all 4 modules, virtual sandbox environments, and course materials.</p>
-                </div>
-            </div>
-            <button onclick="this.parentElement.remove()" style="background: transparent; border: none; font-size: 1.1rem; color: #2d6a4f; cursor: pointer;">✕</button>
-        </div>
-    <?php endif; ?>
+    <!-- ==================================================== -->
+    <!-- SECTION 1: ALL TRACKS LIST VIEW (Mockup 1) -->
+    <!-- ==================================================== -->
+    <div id="tracks-view-container" style="<?= $initialView === 'modules' ? 'display: none;' : 'display: flex; flex-direction: column; gap: 20px;' ?>">
 
-    <!-- Top Metrics Overview: Side-by-Side Cards matching mockup -->
-    <div class="metrics-overview-grid" style="display: grid; grid-template-columns: minmax(300px, 1fr) minmax(380px, 1.35fr); gap: 20px; align-items: stretch;">
-        
-        <!-- Left Card: Circular Overall Progress -->
-        <div class="curriculum-stat-card" style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 22px; padding: 22px 28px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 24px;">
-            <!-- Circular Progress Ring (67%) -->
-            <div style="position: relative; width: 84px; height: 84px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
-                <svg width="84" height="84" viewBox="0 0 88 88" style="transform: rotate(-90deg);">
-                    <!-- Background Circle -->
-                    <circle cx="44" cy="44" r="35" stroke="#e2ece4" stroke-width="7.5" fill="none" />
-                    <!-- Progress Arc (67% of 219.9 = 147.3 dasharray, 72.6 dashoffset) -->
-                    <circle cx="44" cy="44" r="35" stroke="#1c4b32" stroke-width="7.5" stroke-linecap="round" fill="none"
-                            stroke-dasharray="219.9" stroke-dashoffset="72.6" style="transition: stroke-dashoffset 0.8s ease;" />
-                </svg>
-                <div style="position: absolute; text-align: center;">
-                    <span style="font-size: 1.32rem; font-weight: 800; color: #183324; line-height: 1;">67%</span>
-                </div>
-            </div>
-
-            <!-- Overall Progress Info & Bar -->
-            <div style="flex: 1; min-width: 0;">
-                <h3 style="font-size: 1.05rem; font-weight: 700; color: #183324; margin: 0 0 2px 0;">Overall Progress</h3>
-                <p style="font-size: 0.82rem; color: #627467; margin: 0 0 10px 0; font-weight: 500;">Across All Tracks</p>
-                <div style="width: 140px; max-width: 100%; height: 6px; background: #e2ece4; border-radius: 999px; overflow: hidden;">
-                    <div style="width: 67%; height: 100%; background: #1c4b32; border-radius: 999px;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Card: 3 Primary Metrics with Dividers -->
-        <div class="curriculum-stat-card" style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 22px; padding: 22px 28px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-around;">
+        <!-- Top Metrics Overview: Side-by-Side Cards -->
+        <div class="metrics-overview-grid" style="display: grid; grid-template-columns: minmax(300px, 1fr) minmax(380px, 1.35fr); gap: 20px; align-items: stretch;">
             
-            <!-- Metric 1: Enrolled Tracks -->
-            <div style="display: flex; flex-direction: column; gap: 4px; padding: 0 10px;">
-                <span style="font-size: 1.85rem; font-weight: 800; color: #183324; line-height: 1.1;">8</span>
-                <span style="font-size: 0.82rem; font-weight: 500; color: #627467;">Enrolled Tracks</span>
+            <!-- Left Card: Circular Overall Progress (67%) -->
+            <div class="curriculum-stat-card" style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 22px; padding: 22px 28px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 24px;">
+                <div style="position: relative; width: 84px; height: 84px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                    <svg width="84" height="84" viewBox="0 0 88 88" style="transform: rotate(-90deg);">
+                        <circle cx="44" cy="44" r="35" stroke="#e2ece4" stroke-width="7.5" fill="none" />
+                        <circle cx="44" cy="44" r="35" stroke="#1c4b32" stroke-width="7.5" stroke-linecap="round" fill="none"
+                                stroke-dasharray="219.9" stroke-dashoffset="72.6" style="transition: stroke-dashoffset 0.8s ease;" />
+                    </svg>
+                    <div style="position: absolute; text-align: center;">
+                        <span style="font-size: 1.32rem; font-weight: 800; color: #183324; line-height: 1;">67%</span>
+                    </div>
+                </div>
+
+                <div style="flex: 1; min-width: 0;">
+                    <h3 style="font-size: 1.05rem; font-weight: 700; color: #183324; margin: 0 0 2px 0;">Overall Progress</h3>
+                    <p style="font-size: 0.82rem; color: #627467; margin: 0 0 10px 0; font-weight: 500;">Across All Tracks</p>
+                    <div style="width: 140px; max-width: 100%; height: 6px; background: #e2ece4; border-radius: 999px; overflow: hidden;">
+                        <div style="width: 67%; height: 100%; background: #1c4b32; border-radius: 999px;"></div>
+                    </div>
+                </div>
             </div>
 
-            <div style="width: 1px; height: 44px; background: #edf2ed;"></div>
+            <!-- Right Card: 3 Key Metrics with Vertical Dividers -->
+            <div class="curriculum-stat-card" style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 22px; padding: 22px 28px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-around;">
+                <div style="display: flex; flex-direction: column; gap: 4px; padding: 0 10px;">
+                    <span style="font-size: 1.85rem; font-weight: 800; color: #183324; line-height: 1.1;">8</span>
+                    <span style="font-size: 0.82rem; font-weight: 500; color: #627467;">Enrolled Tracks</span>
+                </div>
 
-            <!-- Metric 2: Completed Labs -->
-            <div style="display: flex; flex-direction: column; gap: 4px; padding: 0 10px;">
-                <span style="font-size: 1.85rem; font-weight: 800; color: #183324; line-height: 1.1;">46</span>
-                <span style="font-size: 0.82rem; font-weight: 500; color: #627467;">Completed Labs</span>
+                <div style="width: 1px; height: 44px; background: #edf2ed;"></div>
+
+                <div style="display: flex; flex-direction: column; gap: 4px; padding: 0 10px;">
+                    <span style="font-size: 1.85rem; font-weight: 800; color: #183324; line-height: 1.1;">46</span>
+                    <span style="font-size: 0.82rem; font-weight: 500; color: #627467;">Completed Labs</span>
+                </div>
+
+                <div style="width: 1px; height: 44px; background: #edf2ed;"></div>
+
+                <div style="display: flex; flex-direction: column; gap: 4px; padding: 0 10px;">
+                    <span style="font-size: 1.85rem; font-weight: 800; color: #183324; line-height: 1.1;">12</span>
+                    <span style="font-size: 0.82rem; font-weight: 500; color: #627467;">Pending Labs</span>
+                </div>
             </div>
 
-            <div style="width: 1px; height: 44px; background: #edf2ed;"></div>
+        </div>
 
-            <!-- Metric 3: Pending Labs -->
-            <div style="display: flex; flex-direction: column; gap: 4px; padding: 0 10px;">
-                <span style="font-size: 1.85rem; font-weight: 800; color: #183324; line-height: 1.1;">12</span>
-                <span style="font-size: 0.82rem; font-weight: 500; color: #627467;">Pending Labs</span>
-            </div>
+        <!-- Filter Tabs Row -->
+        <div class="curriculum-filter-tabs" style="display: flex; align-items: center; gap: 32px; border-bottom: 1px solid #e2ece4; margin-top: 6px; padding-bottom: 0;">
+            <button id="tab-all" class="filter-tab-btn active" onclick="switchCurriculumTab('all')"
+                    style="background: transparent; border: none; padding: 8px 4px 12px 4px; font-size: 0.92rem; font-weight: 700; color: #183324; border-bottom: 3px solid #1c4b32; margin-bottom: -1px; cursor: pointer; font-family: inherit; transition: all 0.2s ease;">
+                All Tracks
+            </button>
+            <button id="tab-in-progress" class="filter-tab-btn" onclick="switchCurriculumTab('in-progress')"
+                    style="background: transparent; border: none; padding: 8px 4px 12px 4px; font-size: 0.92rem; font-weight: 500; color: #627467; border-bottom: 3px solid transparent; margin-bottom: -1px; cursor: pointer; font-family: inherit; transition: all 0.2s ease;">
+                In Progress
+            </button>
+            <button id="tab-completed" class="filter-tab-btn" onclick="switchCurriculumTab('completed')"
+                    style="background: transparent; border: none; padding: 8px 4px 12px 4px; font-size: 0.92rem; font-weight: 500; color: #627467; border-bottom: 3px solid transparent; margin-bottom: -1px; cursor: pointer; font-family: inherit; transition: all 0.2s ease;">
+                Completed
+            </button>
+        </div>
+
+        <!-- Main Tracks List Card -->
+        <div id="tracks-list-card" style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 22px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); overflow: hidden;">
+            
+            <?php foreach ($allTracks as $index => $t): ?>
+                <?php 
+                    $code = $t['code'];
+                    $isEnrolled = $t['is_enrolled'] ?? in_array($code, $enrolledList, true);
+                    $prog = (int)($t['display_progress'] ?? $t['progress']);
+                    $statusType = ($prog === 100) ? 'completed' : (($prog > 0) ? 'in-progress' : 'not-started');
+                    $isLast = ($index === count($allTracks) - 1);
+                ?>
+                <div class="track-row-wrapper" data-track-code="<?= htmlspecialchars($code) ?>" data-status="<?= $statusType ?>" data-progress="<?= $prog ?>" style="<?= !$isLast ? 'border-bottom: 1px solid #edf2ed;' : '' ?>">
+                    
+                    <div class="track-row-item" style="padding: 18px 26px; display: flex; align-items: center; justify-content: space-between; gap: 20px; transition: background 0.15s ease;">
+                        
+                        <!-- Left: Soft Green Icon Badge + Track Title & Subtitle -->
+                        <div style="display: flex; align-items: center; gap: 18px; min-width: 0; flex: 1;">
+                            <div class="track-icon-badge" style="width: 48px; height: 48px; min-width: 48px; border-radius: 14px; background: #d7e8db; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <?php if ($t['icon'] === 'shield'): ?>
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                        <path d="M9 12l2 2 4-4"/>
+                                    </svg>
+                                <?php elseif ($t['icon'] === 'hacker'): ?>
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                        <path d="M4 14l2-2m14 0l-2-2"/>
+                                    </svg>
+                                <?php elseif ($t['icon'] === 'key'): ?>
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="7.5" cy="15.5" r="4.5"/>
+                                        <path d="M10.7 12.3L19 4"/>
+                                        <path d="M15 4l4 4"/>
+                                        <path d="M17 6l2-2"/>
+                                    </svg>
+                                <?php elseif ($t['icon'] === 'forensics'): ?>
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                                        <circle cx="12" cy="8" r="1.5" fill="#1c4b32"/>
+                                    </svg>
+                                <?php elseif ($t['icon'] === 'database'): ?>
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                                        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                                        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                                    </svg>
+                                <?php elseif ($t['icon'] === 'network'): ?>
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="2" y="2" width="6" height="6" rx="1"/>
+                                        <rect x="16" y="2" width="6" height="6" rx="1"/>
+                                        <rect x="9" y="16" width="6" height="6" rx="1"/>
+                                        <path d="M5 8v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8"/>
+                                        <path d="M12 13v3"/>
+                                    </svg>
+                                <?php elseif ($t['icon'] === 'theory'): ?>
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="6" cy="6" r="3"/>
+                                        <circle cx="18" cy="6" r="3"/>
+                                        <circle cx="12" cy="18" r="3"/>
+                                        <path d="M8.5 7.5L15.5 7.5"/>
+                                        <path d="M7.5 8.5L10.5 15.5"/>
+                                        <path d="M16.5 8.5L13.5 15.5"/>
+                                    </svg>
+                                <?php else: ?>
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <line x1="2" y1="12" x2="22" y2="12"/>
+                                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                                    </svg>
+                                <?php endif; ?>
+                            </div>
+
+                            <div style="min-width: 0;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <h4 class="track-title-text" style="font-size: 0.96rem; font-weight: 700; color: #183324; margin: 0; line-height: 1.25;">
+                                        <?= htmlspecialchars($t['name']) ?>
+                                    </h4>
+                                    <span style="font-size: 0.7rem; font-weight: 700; color: #5a7061; background: #eaf1eb; padding: 1px 6px; border-radius: 6px;">
+                                        <?= htmlspecialchars($code) ?>
+                                    </span>
+                                </div>
+                                <p class="track-subtitle-text" style="font-size: 0.8rem; color: #627467; margin: 3px 0 0 0; line-height: 1.3;">
+                                    <?= htmlspecialchars($t['subtitle']) ?>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Right: Progress Bar + Percentage + Pill Button -->
+                        <div style="display: flex; align-items: center; gap: 24px; flex-shrink: 0;">
+                            
+                            <div class="track-progress-bar-wrap" style="width: 240px; height: 6px; background: #e2ece4; border-radius: 999px; overflow: hidden;">
+                                <div style="width: <?= $prog ?>%; height: 100%; background: #1c4b32; border-radius: 999px; transition: width 0.4s ease;"></div>
+                            </div>
+
+                            <span style="font-size: 0.86rem; font-weight: 700; color: #183324; width: 44px; text-align: right; flex-shrink: 0;">
+                                <?= $prog ?>%
+                            </span>
+
+                            <!-- Action Pill Button: Continue for Enrolled, View for Catalog/Others -->
+                            <?php if ($isEnrolled): ?>
+                                <button type="button" class="action-pill-btn btn-continue" onclick="showModulesView('<?= htmlspecialchars($code) ?>')" 
+                                        style="padding: 7px 20px; border-radius: 999px; background: #eaf1eb; color: #1c4b32; font-weight: 600; font-size: 0.83rem; border: 1px solid #d4e2d6; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease; font-family: inherit;">
+                                    <span>Continue</span>
+                                    <span style="font-size: 0.95rem;">&rarr;</span>
+                                </button>
+                            <?php else: ?>
+                                <button type="button" class="action-pill-btn btn-view" onclick="showModulesView('<?= htmlspecialchars($code) ?>')" 
+                                        style="padding: 7px 20px; border-radius: 999px; background: #eaf1eb; color: #1c4b32; font-weight: 600; font-size: 0.83rem; border: 1px solid #d4e2d6; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease; font-family: inherit;">
+                                    <span>View</span>
+                                    <span style="font-size: 0.95rem;">&rarr;</span>
+                                </button>
+                            <?php endif; ?>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            <?php endforeach; ?>
 
         </div>
 
     </div>
 
-    <!-- Filter Tabs Row matching mockup -->
-    <div class="curriculum-filter-tabs" style="display: flex; align-items: center; gap: 32px; border-bottom: 1px solid #e2ece4; margin-top: 8px; padding-bottom: 0;">
-        <button id="tab-all" class="filter-tab-btn active" onclick="switchCurriculumTab('all')"
-                style="background: transparent; border: none; padding: 8px 4px 12px 4px; font-size: 0.92rem; font-weight: 700; color: #183324; border-bottom: 3px solid #1c4b32; margin-bottom: -1px; cursor: pointer; font-family: inherit; transition: all 0.2s ease;">
-            All Tracks
-        </button>
-        <button id="tab-in-progress" class="filter-tab-btn" onclick="switchCurriculumTab('in-progress')"
-                style="background: transparent; border: none; padding: 8px 4px 12px 4px; font-size: 0.92rem; font-weight: 500; color: #627467; border-bottom: 3px solid transparent; margin-bottom: -1px; cursor: pointer; font-family: inherit; transition: all 0.2s ease;">
-            In Progress
-        </button>
-        <button id="tab-completed" class="filter-tab-btn" onclick="switchCurriculumTab('completed')"
-                style="background: transparent; border: none; padding: 8px 4px 12px 4px; font-size: 0.92rem; font-weight: 500; color: #627467; border-bottom: 3px solid transparent; margin-bottom: -1px; cursor: pointer; font-family: inherit; transition: all 0.2s ease;">
-            Completed
-        </button>
-    </div>
-
-    <!-- Main Tracks List Container matching mockup -->
-    <div id="tracks-list-card" style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 22px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); overflow: hidden;">
+    <!-- ==================================================== -->
+    <!-- SECTION 2: 2x2 COURSE MODULES VIEW (Mockup 2: media_1794914362125_ecd92b1c.jpg) -->
+    <!-- ==================================================== -->
+    <div id="modules-view-container" style="<?= $initialView === 'modules' ? 'display: flex; flex-direction: column; gap: 20px;' : 'display: none; flex-direction: column; gap: 20px;' ?>">
         
-        <?php foreach ($allTracks as $index => $t): ?>
-            <?php 
-                $code = $t['code'];
-                $isEnrolled = $t['is_enrolled'] ?? in_array($code, $enrolledList, true);
-                $prog = (int)($t['display_progress'] ?? $t['progress']);
-                $statusType = ($prog === 100) ? 'completed' : (($prog > 0) ? 'in-progress' : 'not-started');
-                $isLast = ($index === count($allTracks) - 1);
-            ?>
-            <div class="track-row-wrapper" data-track-code="<?= htmlspecialchars($code) ?>" data-status="<?= $statusType ?>" data-progress="<?= $prog ?>" style="<?= !$isLast ? 'border-bottom: 1px solid #edf2ed;' : '' ?>">
-                
-                <!-- Main Horizontal Track Row -->
-                <div class="track-row-item" style="padding: 18px 26px; display: flex; align-items: center; justify-content: space-between; gap: 20px; transition: background 0.15s ease;">
-                    
-                    <!-- Left: Soft Green Icon Badge + Track Title & Subtitle -->
-                    <div style="display: flex; align-items: center; gap: 18px; min-width: 0; flex: 1;">
-                        <!-- Icon Badge 48x48 in #d7e8db -->
-                        <div class="track-icon-badge" style="width: 48px; height: 48px; min-width: 48px; border-radius: 14px; background: #d7e8db; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                            <?php if ($t['icon'] === 'shield'): ?>
-                                <!-- Shield Icon for Network Defense Essentials -->
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                                    <path d="M9 12l2 2 4-4"/>
-                                </svg>
-                            <?php elseif ($t['icon'] === 'hacker'): ?>
-                                <!-- Hacker / Silhouette Avatar for Ethical Hacking -->
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                    <circle cx="12" cy="7" r="4"/>
-                                    <path d="M4 14l2-2m14 0l-2-2"/>
-                                </svg>
-                            <?php elseif ($t['icon'] === 'key'): ?>
-                                <!-- Key Icon for Cryptographic & Data Security -->
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="7.5" cy="15.5" r="4.5"/>
-                                    <path d="M10.7 12.3L19 4"/>
-                                    <path d="M15 4l4 4"/>
-                                    <path d="M17 6l2-2"/>
-                                </svg>
-                            <?php elseif ($t['icon'] === 'forensics'): ?>
-                                <!-- Siren / Forensics Radar Icon for Incident Response -->
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                                    <circle cx="12" cy="8" r="1.5" fill="#1c4b32"/>
-                                </svg>
-                            <?php elseif ($t['icon'] === 'database'): ?>
-                                <!-- Database Cylinders for DBMS -->
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <ellipse cx="12" cy="5" rx="9" ry="3"/>
-                                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
-                                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
-                                </svg>
-                            <?php elseif ($t['icon'] === 'network'): ?>
-                                <!-- Network Topology Nodes for Computer Networks -->
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="2" y="2" width="6" height="6" rx="1"/>
-                                    <rect x="16" y="2" width="6" height="6" rx="1"/>
-                                    <rect x="9" y="16" width="6" height="6" rx="1"/>
-                                    <path d="M5 8v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8"/>
-                                    <path d="M12 13v3"/>
-                                </svg>
-                            <?php elseif ($t['icon'] === 'theory'): ?>
-                                <!-- Finite Automata Graph for Theory of Computation -->
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="6" cy="6" r="3"/>
-                                    <circle cx="18" cy="6" r="3"/>
-                                    <circle cx="12" cy="18" r="3"/>
-                                    <path d="M8.5 7.5L15.5 7.5"/>
-                                    <path d="M7.5 8.5L10.5 15.5"/>
-                                    <path d="M16.5 8.5L13.5 15.5"/>
-                                </svg>
-                            <?php else: ?>
-                                <!-- Web Browser & ERP System Icon -->
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <line x1="2" y1="12" x2="22" y2="12"/>
-                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                                </svg>
-                            <?php endif; ?>
+        <!-- Modules View Top Bar: Back Button, Title & Track Switcher -->
+        <div style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 20px; padding: 18px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 14px;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <button type="button" onclick="showTracksView()" style="display: inline-flex; align-items: center; gap: 6px; background: #eaf1eb; color: #1c4b32; border: 1px solid #d4e2d6; padding: 6px 14px; border-radius: 999px; font-size: 0.82rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.15s ease;">
+                        <span>&larr;</span>
+                        <span>Back to All Tracks</span>
+                    </button>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span id="mv-track-code" style="background: #d7e8db; color: #1c4b32; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 6px;">
+                                CYB302
+                            </span>
+                            <h2 id="mv-track-name" class="font-serif" style="font-size: 1.25rem; font-weight: 700; color: #183324; margin: 0; line-height: 1.2;">
+                                Ethical Hacking & Pen Testing
+                            </h2>
                         </div>
-
-                        <!-- Titles -->
-                        <div style="min-width: 0;">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <h4 class="track-title-text" style="font-size: 0.96rem; font-weight: 700; color: #183324; margin: 0; line-height: 1.25;">
-                                    <?= htmlspecialchars($t['name']) ?>
-                                </h4>
-                                <span style="font-size: 0.7rem; font-weight: 700; color: #5a7061; background: #eaf1eb; padding: 1px 6px; border-radius: 6px;">
-                                    <?= htmlspecialchars($code) ?>
-                                </span>
-                            </div>
-                            <p class="track-subtitle-text" style="font-size: 0.8rem; color: #627467; margin: 3px 0 0 0; line-height: 1.3;">
-                                <?= htmlspecialchars($t['subtitle']) ?>
-                            </p>
-                        </div>
+                        <p id="mv-track-subtitle" style="font-size: 0.8rem; color: #627467; margin: 2px 0 0 0;">
+                            Learn penetration testing techniques • 4 Syllabus Modules
+                        </p>
                     </div>
-
-                    <!-- Right: Progress Bar + Percentage + Pill Button -->
-                    <div style="display: flex; align-items: center; gap: 24px; flex-shrink: 0;">
-                        
-                        <!-- Horizontal Progress Bar (240px) -->
-                        <div class="track-progress-bar-wrap" style="width: 240px; height: 6px; background: #e2ece4; border-radius: 999px; overflow: hidden;">
-                            <div style="width: <?= $prog ?>%; height: 100%; background: #1c4b32; border-radius: 999px; transition: width 0.4s ease;"></div>
-                        </div>
-
-                        <!-- Percentage Label -->
-                        <span style="font-size: 0.86rem; font-weight: 700; color: #183324; width: 44px; text-align: right; flex-shrink: 0;">
-                            <?= $prog ?>%
-                        </span>
-
-                        <!-- Action Pill Button -->
-                        <?php if ($isEnrolled): ?>
-                            <button type="button" class="action-pill-btn btn-continue" onclick="toggleTrackDrawer('<?= htmlspecialchars($code) ?>')" 
-                                    style="padding: 7px 20px; border-radius: 999px; background: #eaf1eb; color: #1c4b32; font-weight: 600; font-size: 0.83rem; border: 1px solid #d4e2d6; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease; font-family: inherit;">
-                                <span>Continue</span>
-                                <span style="font-size: 0.95rem;">&rarr;</span>
-                            </button>
-                        <?php else: ?>
-                            <button type="button" class="action-pill-btn btn-buy" onclick="openPurchaseModal('<?= htmlspecialchars($code) ?>', '<?= htmlspecialchars(addslashes($t['name'])) ?>', '<?= htmlspecialchars($t['price']) ?>')" 
-                                    style="padding: 7px 20px; border-radius: 999px; background: #fdf6ea; color: #92580a; font-weight: 600; font-size: 0.83rem; border: 1px solid #f6deb3; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease; font-family: inherit;">
-                                <span>Buy Course</span>
-                                <span style="font-size: 0.95rem;">&rarr;</span>
-                            </button>
-                        <?php endif; ?>
-
-                    </div>
-
                 </div>
 
-                <!-- Expandable Modules Drawer (Opens on "Continue" or Click) -->
-                <div id="drawer-<?= htmlspecialchars($code) ?>" class="track-modules-drawer" style="display: none; background: #f8faf8; border-top: 1px solid #edf2ed; padding: 22px 26px 26px 26px;">
-                    
-                    <!-- Drawer Header with Syllabus Info -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid #e7efe9;">
-                        <div>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="font-size: 0.74rem; font-weight: 800; color: #1c4b32; background: #d7e8db; padding: 2px 8px; border-radius: 6px;">
-                                    <?= htmlspecialchars($code) ?> SYLLABUS
-                                </span>
-                                <span style="font-size: 0.82rem; font-weight: 600; color: #3b5343;">
-                                    Mentor: <?= htmlspecialchars($t['instructor_name'] ?? 'Prof. Robert Miller') ?>
-                                </span>
-                                <span style="color: #9ab0a0;">•</span>
-                                <span style="font-size: 0.82rem; color: #627467;">
-                                    Credits: <?= htmlspecialchars($t['credits'] ?? 4) ?>
-                                </span>
-                            </div>
-                        </div>
-
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <?php if ($isEnrolled): ?>
-                                <span style="font-size: 0.74rem; font-weight: 700; color: #2e7d32; background: #e8f5e9; padding: 3px 10px; border-radius: 999px; border: 1px solid #c8e6c9;">
-                                    ✓ Enrolled Track (All Modules Unlocked)
-                                </span>
-                            <?php else: ?>
-                                <span style="font-size: 0.74rem; font-weight: 700; color: #b45309; background: #fffbeb; padding: 3px 10px; border-radius: 999px; border: 1px solid #fde68a;">
-                                    🔒 Preview Mode (Requires Purchase to Access)
-                                </span>
-                            <?php endif; ?>
-                            <button onclick="toggleTrackDrawer('<?= htmlspecialchars($code) ?>')" style="background: transparent; border: none; font-size: 0.8rem; font-weight: 600; color: #627467; cursor: pointer;">
-                                Close ✕
-                            </button>
-                        </div>
+                <!-- Track Overall Progress Indicator -->
+                <div style="display: flex; align-items: center; gap: 12px; background: #f8faf8; padding: 6px 16px; border-radius: 999px; border: 1px solid #e2ece4;">
+                    <span style="font-size: 0.78rem; font-weight: 600; color: #5a7061;">Track Progress:</span>
+                    <div style="width: 100px; height: 6px; background: #e2ece4; border-radius: 999px; overflow: hidden;">
+                        <div id="mv-track-progbar" style="width: 50%; height: 100%; background: #1c4b32; border-radius: 999px; transition: width 0.4s ease;"></div>
                     </div>
-
-                    <!-- 4 Modules Grid for this Track -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
-                        <?php 
-                            $modules = $t['modules'] ?? [];
-                            foreach ($modules as $mod): 
-                                $modNum = $mod['number'] ?? 1;
-                                $modProgress = $mod['progress'] ?? 0;
-                                $lessons = $mod['lessons'] ?? [];
-                        ?>
-                            <div class="module-card-box" style="background: #ffffff; border: 1px solid #e2ece4; border-radius: 16px; padding: 18px 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.02); transition: transform 0.15s ease, box-shadow 0.15s ease;">
-                                
-                                <div>
-                                    <!-- Module Number & Progress Badge -->
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                        <span style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #5a7061;">
-                                            Module <?= $modNum ?>
-                                        </span>
-                                        <?php if ($modProgress === 100): ?>
-                                            <span style="font-size: 0.7rem; font-weight: 700; background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 999px;">
-                                                100% Completed
-                                            </span>
-                                        <?php elseif ($modProgress > 0): ?>
-                                            <span style="font-size: 0.7rem; font-weight: 700; background: #eaf1eb; color: #1c4b32; padding: 2px 8px; border-radius: 999px;">
-                                                <?= $modProgress ?>% In Progress
-                                            </span>
-                                        <?php else: ?>
-                                            <span style="font-size: 0.7rem; font-weight: 600; background: #f5f7f5; color: #7a8d80; padding: 2px 8px; border-radius: 999px;">
-                                                Not Started
-                                            </span>
-                                        <?php endif; ?>
-                                    </div>
-
-                                    <!-- Module Title -->
-                                    <h5 style="font-size: 0.92rem; font-weight: 700; color: #183324; margin: 0 0 10px 0; line-height: 1.3;">
-                                        <?= htmlspecialchars($mod['title']) ?>
-                                    </h5>
-
-                                    <!-- Lessons List Preview -->
-                                    <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px;">
-                                        <?php foreach ($lessons as $l): ?>
-                                            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.76rem; color: #435b4b; background: #f8faf8; padding: 5px 10px; border-radius: 8px;">
-                                                <div style="display: flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                                    <span style="font-weight: 700; color: #1c4b32;"><?= htmlspecialchars($l['code']) ?></span>
-                                                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($l['title']) ?></span>
-                                                </div>
-                                                <span style="color: #7a8d80; font-size: 0.7rem; flex-shrink: 0;"><?= htmlspecialchars($l['duration']) ?></span>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    </div>
-                                </div>
-
-                                <!-- Action Button: Open Interactive Learning Modal or Buy -->
-                                <?php if ($isEnrolled): ?>
-                                    <button type="button" onclick="openLearningModal('<?= htmlspecialchars($code) ?>', <?= (int)$modNum ?>)"
-                                            style="width: 100%; padding: 8px 14px; border-radius: 10px; background: #1c4b32; color: #ffffff; border: none; font-weight: 600; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.15s ease; font-family: inherit;">
-                                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <span>Start Learning / Review</span>
-                                    </button>
-                                <?php else: ?>
-                                    <button type="button" onclick="openPurchaseModal('<?= htmlspecialchars($code) ?>', '<?= htmlspecialchars(addslashes($t['name'])) ?>', '<?= htmlspecialchars($t['price']) ?>')"
-                                            style="width: 100%; padding: 8px 14px; border-radius: 10px; background: #fef3c7; color: #92400e; border: 1px solid #fde68a; font-weight: 600; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit;">
-                                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                        </svg>
-                                        <span>Unlock Course to Access (<?= htmlspecialchars($t['price']) ?>)</span>
-                                    </button>
-                                <?php endif; ?>
-
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-
+                    <span id="mv-track-percent" style="font-size: 0.82rem; font-weight: 800; color: #183324;">50%</span>
                 </div>
-
             </div>
-        <?php endforeach; ?>
+
+            <!-- Quick Track Selector Pills -->
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-top: 10px; border-top: 1px solid #edf2ed;">
+                <span style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #627467; margin-right: 4px;">
+                    Select Track:
+                </span>
+                <?php foreach ($allTracks as $trackItem): ?>
+                    <?php $tCode = $trackItem['code']; ?>
+                    <button type="button" class="mv-track-pill-btn <?= $tCode === $activeTrackCode ? 'active' : '' ?>" 
+                            data-code="<?= htmlspecialchars($tCode) ?>" 
+                            onclick="showModulesView('<?= htmlspecialchars($tCode) ?>')"
+                            style="padding: 5px 12px; border-radius: 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.15s ease; border: 1px solid; <?= $tCode === $activeTrackCode ? 'background: #1c4b32; color: #ffffff; border-color: #1c4b32;' : 'background: #f8faf8; color: #405948; border-color: #dce7df;' ?>">
+                        <?= htmlspecialchars($tCode) ?>
+                    </button>
+                <?php endforeach; ?>
+            </div>
+
+        </div>
+
+        <!-- 2x2 Grid of 4 Module Cards (Exact Match to Mockup Image media_1794914362125_ecd92b1c.jpg) -->
+        <div id="modules-grid-2x2" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+            <!-- Dynamically populated or server-rendered for active track -->
+        </div>
 
     </div>
 
@@ -486,82 +413,12 @@ $enrolledList = $enrolledCourses ?? ['CYB301', 'CYB302', 'CYB303', 'CYB304', 'CS
 
 </div>
 
-<!-- ==================================================== -->
-<!-- INSTANT COURSE PURCHASE MODAL -->
-<!-- ==================================================== -->
-<div id="purchaseModal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(18, 38, 26, 0.65); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 20px;">
-    
-    <div style="background: #ffffff; border-radius: 24px; width: 100%; max-width: 520px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: modalFadeIn 0.2s ease-out;">
-        
-        <div style="background: #1c4b32; color: #ffffff; padding: 22px 24px; position: relative;">
-            <button onclick="closePurchaseModal()" style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.15); border: none; color: #ffffff; width: 30px; height: 30px; border-radius: 50%; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                ✕
-            </button>
-            <span id="pm-course-code" style="background: rgba(255,255,255,0.2); font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 6px;">
-                CS301
-            </span>
-            <h3 id="pm-course-name" style="font-size: 1.25rem; font-weight: 700; margin: 10px 0 4px 0; line-height: 1.25;">
-                Database Management Systems
-            </h3>
-            <p style="font-size: 0.82rem; color: #c4decb; margin: 0;">
-                Full-Semester Practical Curriculum & Certification Track
-            </p>
-        </div>
-
-        <form action="/student/courses/buy" method="POST" style="padding: 24px; margin: 0;">
-            <?= \App\Core\Csrf::field() ?>
-            <input type="hidden" name="code" id="pm-input-code" value="">
-
-            <div style="margin-bottom: 20px;">
-                <h4 style="font-size: 0.84rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #435b4b; margin: 0 0 10px 0;">
-                    Included with Enrollment:
-                </h4>
-                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.82rem; color: #2e4738;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="color: #2d6a4f; font-weight: 800;">✓</span>
-                        <span>Full access to all 4 modules and recorded mentor walkthroughs</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="color: #2d6a4f; font-weight: 800;">✓</span>
-                        <span>Interactive terminal environments & live sandbox exercises</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="color: #2d6a4f; font-weight: 800;">✓</span>
-                        <span>Final Capstone defense and verified Kalavanta Certificate</span>
-                    </div>
-                </div>
-            </div>
-
-            <div style="background: #f7faf8; border: 1px solid #d8e6db; border-radius: 14px; padding: 14px 18px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <span style="font-size: 0.74rem; font-weight: 600; color: #627467; display: block;">Enrollment Fee</span>
-                    <span id="pm-price" style="font-size: 1.45rem; font-weight: 800; color: #183324;">₹1,499</span>
-                </div>
-                <span style="font-size: 0.74rem; font-weight: 700; color: #2e7d32; background: #e8f5e9; padding: 4px 10px; border-radius: 999px;">
-                    Student Cohort Access
-                </span>
-            </div>
-
-            <div style="display: flex; gap: 10px;">
-                <button type="button" onclick="closePurchaseModal()" style="flex: 1; padding: 11px; border-radius: 10px; background: #f1f4f2; color: #5a7061; border: none; font-weight: 600; font-size: 0.84rem; cursor: pointer; font-family: inherit;">
-                    Cancel
-                </button>
-                <button type="submit" style="flex: 2; padding: 11px; border-radius: 10px; background: #1c4b32; color: #ffffff; border: none; font-weight: 700; font-size: 0.86rem; cursor: pointer; font-family: inherit; box-shadow: 0 2px 8px rgba(28,75,50,0.25);">
-                    Confirm & Unlock Instantly &rarr;
-                </button>
-            </div>
-        </form>
-
-    </div>
-
-</div>
-
-<!-- Data store for interactive Learning Modal -->
+<!-- Data store for interactive Modules View & Learning Modal -->
 <script>
 window.__CURRICULUM_DATA__ = <?= json_encode($allTracks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
+window.__ACTIVE_TRACK_CODE__ = <?= json_encode($activeTrackCode) ?>;
 </script>
 
-<!-- Embedded Interactive Scripts for Filter Tabs, Drawers, Modals & Live Search -->
 <style>
 @keyframes modalFadeIn {
     from { opacity: 0; transform: translateY(14px) scale(0.98); }
@@ -570,22 +427,37 @@ window.__CURRICULUM_DATA__ = <?= json_encode($allTracks, JSON_HEX_TAG | JSON_HEX
 .track-row-item:hover {
     background: #fafcfb;
 }
-.action-pill-btn.btn-continue:hover {
+.action-pill-btn:hover {
     background: #1c4b32 !important;
     color: #ffffff !important;
     border-color: #1c4b32 !important;
     box-shadow: 0 3px 8px rgba(28, 75, 50, 0.18);
 }
-.action-pill-btn.btn-buy:hover {
-    background: #fde68a !important;
-    color: #78350f !important;
-    border-color: #f59e0b !important;
+.module-2x2-card {
+    background: #ffffff;
+    border: 1px solid #e2ece4;
+    border-radius: 22px;
+    padding: 24px 26px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 16px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.module-card-box:hover {
+.module-2x2-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(28, 75, 50, 0.06) !important;
+    box-shadow: 0 6px 18px rgba(28, 75, 50, 0.06);
 }
-@media (max-width: 900px) {
+.module-btn-action:hover {
+    background: #143724 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(28, 75, 50, 0.22);
+}
+@media (max-width: 960px) {
+    #modules-grid-2x2 {
+        grid-template-columns: 1fr !important;
+    }
     .metrics-overview-grid {
         grid-template-columns: 1fr !important;
     }
@@ -605,7 +477,194 @@ window.__CURRICULUM_DATA__ = <?= json_encode($allTracks, JSON_HEX_TAG | JSON_HEX
 </style>
 
 <script>
-// Filter Tabs Switching (All Tracks, In Progress, Completed)
+// ==========================================
+// VIEW SWITCHING: Tracks List <-> 2x2 Modules
+// ==========================================
+
+function showTracksView() {
+    document.getElementById('modules-view-container').style.display = 'none';
+    const tracksContainer = document.getElementById('tracks-view-container');
+    tracksContainer.style.display = 'flex';
+    tracksContainer.style.flexDirection = 'column';
+    tracksContainer.style.gap = '20px';
+    
+    // Update browser URL cleanly
+    try {
+        history.pushState(null, '', '/student/curriculum');
+    } catch(e) {}
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showModulesView(trackCode) {
+    const track = window.__CURRICULUM_DATA__.find(t => t.code === trackCode);
+    if (!track) return;
+
+    window.__ACTIVE_TRACK_CODE__ = trackCode;
+
+    // Update Topbar Info in Modules View
+    document.getElementById('mv-track-code').textContent = track.code;
+    document.getElementById('mv-track-name').textContent = track.name;
+    document.getElementById('mv-track-subtitle').textContent = track.subtitle + ' • 4 Syllabus Modules';
+    
+    const prog = track.display_progress !== undefined ? track.display_progress : track.progress;
+    document.getElementById('mv-track-progbar').style.width = prog + '%';
+    document.getElementById('mv-track-percent').textContent = prog + '%';
+
+    // Update track selector pills active state
+    document.querySelectorAll('.mv-track-pill-btn').forEach(btn => {
+        if (btn.getAttribute('data-code') === trackCode) {
+            btn.style.background = '#1c4b32';
+            btn.style.color = '#ffffff';
+            btn.style.borderColor = '#1c4b32';
+        } else {
+            btn.style.background = '#f8faf8';
+            btn.style.color = '#405948';
+            btn.style.borderColor = '#dce7df';
+        }
+    });
+
+    // Render the 4 Module Cards in 2x2 Grid matching mockup
+    render2x2ModulesGrid(track);
+
+    // Switch view containers
+    document.getElementById('tracks-view-container').style.display = 'none';
+    const modulesContainer = document.getElementById('modules-view-container');
+    modulesContainer.style.display = 'flex';
+    modulesContainer.style.flexDirection = 'column';
+    modulesContainer.style.gap = '20px';
+
+    // Update browser URL cleanly
+    try {
+        history.pushState(null, '', '/student/curriculum?track=' + encodeURIComponent(trackCode));
+    } catch(e) {}
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function render2x2ModulesGrid(track) {
+    const container = document.getElementById('modules-grid-2x2');
+    container.innerHTML = '';
+    const modules = track.modules || [];
+
+    modules.forEach((mod) => {
+        const modNum = mod.number || 1;
+        const modTitle = mod.title || ('Module ' + modNum);
+        const modProg = mod.progress || 0;
+        const modImage = mod.image || ('/assets/img/curriculum-mod' + modNum + '.png');
+        const lessons = mod.lessons || [];
+
+        // Exact button labels matching mockup image media_1794914362125_ecd92b1c.jpg:
+        // Mod 1 -> Viewed (100%), Mod 2 -> Continue (75%), Mod 3 -> Continue (40%), Mod 4 -> Start Module (10%)
+        let btnText = mod.action_label;
+        if (!btnText) {
+            if (modProg === 100) btnText = 'Viewed';
+            else if (modProg > 0) btnText = 'Continue';
+            else btnText = 'Start Module';
+        }
+
+        // Circular Donut Ring Calculation (radius 17, circumference 106.8)
+        const circumference = 106.8;
+        const dashoffset = circumference * (1 - (modProg / 100));
+
+        // Build Card HTML
+        const card = document.createElement('div');
+        card.className = 'module-2x2-card';
+
+        // Header: Title + Circular Ring
+        let headerHtml = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 14px;">
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #183324; margin: 0; line-height: 1.3;">
+                    ${escapeHtml(modTitle)}
+                </h3>
+                <div style="position: relative; width: 44px; height: 44px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                    <svg width="44" height="44" viewBox="0 0 44 44" style="transform: rotate(-90deg);">
+                        <circle cx="22" cy="22" r="17" stroke="#e2ece4" stroke-width="3.5" fill="none" />
+                        <circle cx="22" cy="22" r="17" stroke="#1c4b32" stroke-width="3.5" stroke-linecap="round" fill="none"
+                                stroke-dasharray="106.8" stroke-dashoffset="${dashoffset.toFixed(1)}" />
+                    </svg>
+                    <span style="position: absolute; font-size: 0.72rem; font-weight: 800; color: #183324;">
+                        ${modProg}%
+                    </span>
+                </div>
+            </div>
+        `;
+
+        // Body: Left Illustration Box + Right Lessons Checklist
+        let lessonsHtml = '';
+        lessons.forEach(l => {
+            const isCompleted = (l.status === 'completed');
+            const isInProgress = (l.status === 'in_progress');
+
+            // Left icon
+            let iconHtml = '';
+            if (isCompleted) {
+                iconHtml = `<span style="width: 17px; height: 17px; min-width: 17px; border-radius: 50%; background: #2d6a4f; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 0.62rem; font-weight: 800;">✓</span>`;
+            } else if (isInProgress) {
+                iconHtml = `<span style="width: 17px; height: 17px; min-width: 17px; border-radius: 50%; border: 2px dashed #2d6a4f; display: flex; align-items: center; justify-content: center;"></span>`;
+            } else {
+                iconHtml = `<span style="width: 17px; height: 17px; min-width: 17px; border-radius: 50%; border: 1.5px solid #b8ccbc; display: flex; align-items: center; justify-content: center;"></span>`;
+            }
+
+            // Right status
+            let rightStatusHtml = '';
+            if (isCompleted) {
+                rightStatusHtml = `<span style="color: #617b68; font-size: 0.8rem; font-weight: 600;">✓</span>`;
+            } else if (isInProgress) {
+                rightStatusHtml = `<span style="color: #2d6a4f; font-size: 0.74rem; font-weight: 700;">In Progress</span>`;
+            } else {
+                rightStatusHtml = `<span style="color: #829687; font-size: 0.74rem; font-weight: 500;">Not Started</span>`;
+            }
+
+            lessonsHtml += `
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                        ${iconHtml}
+                        <span style="font-size: 0.82rem; font-weight: 500; color: #223c2a; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            ${escapeHtml(l.code)} ${escapeHtml(l.title)}
+                        </span>
+                    </div>
+                    <div style="flex-shrink: 0;">
+                        ${rightStatusHtml}
+                    </div>
+                </div>
+            `;
+        });
+
+        let bodyHtml = `
+            <div style="display: flex; align-items: center; gap: 18px; margin: 12px 0;">
+                <div style="width: 110px; height: 110px; min-width: 110px; border-radius: 16px; background: #f2f7f3; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <img src="${modImage}" alt="${escapeHtml(modTitle)}" style="max-width: 90px; max-height: 90px; object-fit: contain;">
+                </div>
+                <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 9px;">
+                    ${lessonsHtml}
+                </div>
+            </div>
+        `;
+
+        // Footer: Dark Green Pill Button matching mockup
+        let footerHtml = `
+            <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: auto; padding-top: 4px;">
+                <button type="button" class="module-btn-action" onclick="openLearningModal('${track.code}', ${modNum})"
+                        style="background: #1c4b32; color: #ffffff; border: none; border-radius: 999px; padding: 8px 26px; font-weight: 600; font-size: 0.84rem; cursor: pointer; transition: all 0.15s ease; font-family: inherit;">
+                    ${escapeHtml(btnText)}
+                </button>
+            </div>
+        `;
+
+        card.innerHTML = headerHtml + bodyHtml + footerHtml;
+        container.appendChild(card);
+    });
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+    });
+}
+
+// ==========================================
+// FILTER TABS SWITCHING (Tracks List)
+// ==========================================
 function switchCurriculumTab(tabType) {
     document.querySelectorAll('.filter-tab-btn').forEach(btn => {
         btn.classList.remove('active');
@@ -635,18 +694,9 @@ function switchCurriculumTab(tabType) {
     });
 }
 
-// Toggle Track Modules Drawer
-function toggleTrackDrawer(trackCode) {
-    const drawer = document.getElementById('drawer-' + trackCode);
-    if (!drawer) return;
-    const isHidden = (drawer.style.display === 'none' || drawer.style.display === '');
-    drawer.style.display = isHidden ? 'block' : 'none';
-    if (isHidden) {
-        drawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-}
-
-// Learning Modal Logic
+// ==========================================
+// INTERACTIVE LEARNING MODAL
+// ==========================================
 let currentModalTrack = null;
 let currentModalModule = null;
 let currentModalLessonIdx = 0;
@@ -781,21 +831,18 @@ function launchVirtualLabDemo() {
     alert('Launching sandbox instance for ' + currentModalTrack.name + ' (' + currentModalTrack.code + ')...\nVirtual Terminal Container active on port 4200.');
 }
 
-// Course Purchase Modal Logic
-function openPurchaseModal(code, name, price) {
-    document.getElementById('pm-input-code').value = code;
-    document.getElementById('pm-course-code').textContent = code;
-    document.getElementById('pm-course-name').textContent = name;
-    document.getElementById('pm-price').textContent = price;
-    document.getElementById('purchaseModal').style.display = 'flex';
-}
-
-function closePurchaseModal() {
-    document.getElementById('purchaseModal').style.display = 'none';
-}
-
-// Live Search Integration with Topbar Search Pill
+// ==========================================
+// INITIAL SETUP ON DOM LOAD
+// ==========================================
 document.addEventListener('DOMContentLoaded', function() {
+    // Initial render of 2x2 grid if modules view is requested
+    const initialTrackCode = window.__ACTIVE_TRACK_CODE__ || 'CYB302';
+    const track = window.__CURRICULUM_DATA__.find(t => t.code === initialTrackCode);
+    if (track) {
+        render2x2ModulesGrid(track);
+    }
+
+    // Topbar live search integration
     const searchInput = document.querySelector('.search-pill-box input');
     if (!searchInput) return;
 
@@ -811,9 +858,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const code = (row.getAttribute('data-track-code') || '').toLowerCase();
             const title = (row.querySelector('.track-title-text')?.textContent || '').toLowerCase();
             const subtitle = (row.querySelector('.track-subtitle-text')?.textContent || '').toLowerCase();
-            const drawerContent = (row.querySelector('.track-modules-drawer')?.textContent || '').toLowerCase();
 
-            if (code.includes(query) || title.includes(query) || subtitle.includes(query) || drawerContent.includes(query)) {
+            if (code.includes(query) || title.includes(query) || subtitle.includes(query)) {
                 row.style.display = 'block';
             } else {
                 row.style.display = 'none';

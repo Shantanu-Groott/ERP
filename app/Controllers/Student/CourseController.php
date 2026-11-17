@@ -194,6 +194,9 @@ class CourseController
             ];
         }
 
+        $hasTrackParam = ($request->input('track') !== null && trim((string)$request->input('track')) !== '');
+        $initialView = $hasTrackParam ? 'modules' : 'tracks';
+
         View::render('student.curriculum', [
             'title' => 'Curriculum',
             'headerTitle' => 'Curriculum',
@@ -205,6 +208,7 @@ class CourseController
             'allTracks' => $allTracks,
             'enrolledCourses' => $enrolledCourses,
             'selectedTrack' => $activeCode,
+            'initialView' => $initialView,
             'overallProgress' => 67,
             'enrolledTracksCount' => count($subjects),
             'completedLabsCount' => 46,
