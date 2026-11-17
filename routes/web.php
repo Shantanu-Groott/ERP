@@ -9,6 +9,7 @@ use App\Controllers\Student\NoticeController as StudentNotice;
 use App\Controllers\Student\CertificateController as StudentCertificate;
 use App\Controllers\Student\CareerController as StudentCareer;
 use App\Controllers\Student\LiveClassController as StudentLiveClass;
+use App\Controllers\Student\ProfileController as StudentProfile;
 
 use App\Middleware\AuthMiddleware;
 use App\Middleware\CsrfMiddleware;
@@ -76,5 +77,13 @@ $router->get('/student/projects', [StudentCareer::class, 'projects'], [
 ]);
 
 $router->get('/student/live-class', [StudentLiveClass::class, 'index'], [
+    AuthMiddleware::class
+]);
+
+$router->get('/student/profile', [StudentProfile::class, 'index'], [
+    AuthMiddleware::class
+]);
+
+$router->post('/student/profile/update', [StudentProfile::class, 'update'], [
     AuthMiddleware::class
 ]);
