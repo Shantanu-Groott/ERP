@@ -11,7 +11,7 @@
         :root {
             --bg-sage: #e8efe9;
             --bg-surface: #f4f7f4;
-            --sidebar-bg: #eef3ee;
+            --sidebar-bg: #ffffffff;
             --card-bg: #ffffff;
             --card-muted: #f7faf7;
             --text-dark: #1e2d24;
