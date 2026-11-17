@@ -11,7 +11,7 @@
         :root {
             --bg-sage: #e8efe9;
             --bg-surface: #f4f7f4;
-            --sidebar-bg: #eef3ee;
+            --sidebar-bg: #ffffffff;
             --card-bg: #ffffff;
             --card-muted: #f7faf7;
             --text-dark: #1e2d24;
@@ -434,14 +434,7 @@
                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 22px; padding: 2px 2px;">
                     <a href="/student/dashboard" style="display: flex; align-items: center; gap: 9px; text-decoration: none;">
                         <img src="/assets/img/logo.png" alt="Kalavanta" style="height: 28px; width: auto; object-fit: contain;">
-                        <div style="display: flex; flex-direction: column; line-height: 1.1;">
-                            <span style="font-size: 0.92rem; font-weight: 800; color: #163622; letter-spacing: -0.2px;">Kalavanta</span>
-                            <span style="font-size: 0.8rem; font-weight: 700; color: #2e5a3c;">Edutech</span>
-                        </div>
                     </a>
-                    <span style="background: #d8e8dc; color: #205034; font-size: 0.72rem; font-weight: 700; padding: 3px 9px; border-radius: 9999px;">
-                        Student
-                    </span>
                 </div>
 
                 <!-- User Profile Pill -->
@@ -452,10 +445,6 @@
                     <div>
                         <div class="user-meta-name">
                             <?= htmlspecialchars(\App\Core\Session::get('user_name', 'Shantanu')) ?>
-                        </div>
-                        <div class="user-badges-row">
-                            <span class="pill-tag pill-premium">Premium</span>
-                            <span class="pill-tag pill-role">Student</span>
                         </div>
                     </div>
                 </div>
