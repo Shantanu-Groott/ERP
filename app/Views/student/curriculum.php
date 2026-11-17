@@ -1,248 +1,338 @@
 <?php
 /**
- * Kalavanta Edutech - Student Curriculum & Course Learning Portal
+ * Kalavanta Edutech - Student Curriculum & Learning Paths
+ * Adapted to List-Based Track View matching official mockup
  */
-$enrolledList = $enrolledCourses ?? ['CYB301', 'CYB302', 'CYB303', 'CYB304'];
+$enrolledList = $enrolledCourses ?? ['CYB301', 'CYB302', 'CYB303', 'CYB304', 'CS301', 'CS302', 'CS303', 'CS304'];
 ?>
-<div style="display: flex; flex-direction: column; gap: 24px;">
+<div class="curriculum-portal-container" style="display: flex; flex-direction: column; gap: 20px;">
 
-    <!-- Notification Alert for Instant Unlocks -->
+    <!-- Instant Unlock Notification Alert -->
     <?php if (!empty($_GET['unlocked'])): ?>
-        <div style="background: #e6f4ea; border: 1px solid #a8dab5; border-radius: 14px; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 14px; box-shadow: 0 2px 6px rgba(28, 75, 50, 0.08);">
+        <div style="background: #e6f4ea; border: 1px solid #a8dab5; border-radius: 16px; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 14px; box-shadow: 0 2px 8px rgba(28, 75, 50, 0.08);">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <span style="width: 32px; height: 32px; border-radius: 50%; background: #2d6a4f; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem;">✓</span>
                 <div>
-                    <h4 style="font-size: 0.92rem; font-weight: 700; color: #153e28; margin: 0 0 2px 0;">Course Successfully Unlocked!</h4>
-                    <p style="font-size: 0.78rem; color: #375943; margin: 0;">You now have full access to all 4 modules, command terminals, and interactive sandboxes.</p>
+                    <h4 style="font-size: 0.92rem; font-weight: 700; color: #153e28; margin: 0 0 2px 0;">Track Successfully Unlocked!</h4>
+                    <p style="font-size: 0.78rem; color: #375943; margin: 0;">You have full enrolled access to all 4 modules, virtual sandbox environments, and course materials.</p>
                 </div>
             </div>
             <button onclick="this.parentElement.remove()" style="background: transparent; border: none; font-size: 1.1rem; color: #2d6a4f; cursor: pointer;">✕</button>
         </div>
     <?php endif; ?>
 
-    <!-- Top Course Navigation Bar (Replaces cramped text with clean, elegant tabs) -->
-    <div style="background: #ffffff; border: 1px solid #d8e2d8; border-radius: 20px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 16px;">
+    <!-- Top Metrics Overview: Side-by-Side Cards matching mockup -->
+    <div class="metrics-overview-grid" style="display: grid; grid-template-columns: minmax(300px, 1fr) minmax(380px, 1.35fr); gap: 20px; align-items: stretch;">
         
-        <!-- Header row with Filter Switcher & Student Identity -->
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid #edf2ed;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #627467;">
-                    Select Course:
-                </span>
-                <div style="display: inline-flex; background: #eaf1eb; padding: 3px; border-radius: 10px; border: 1px solid #d8e5da;">
-                    <button id="filter-btn-enrolled" onclick="filterTrackPills('enrolled')" style="background: #ffffff; color: #1c4b32; font-weight: 700; font-size: 0.78rem; padding: 4px 12px; border-radius: 7px; border: none; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.06); font-family: inherit;">
-                        My Enrolled Courses (<?= count($myEnrolledSubjects) ?>)
-                    </button>
-                    <button id="filter-btn-all" onclick="filterTrackPills('all')" style="background: transparent; color: #5a7061; font-weight: 600; font-size: 0.78rem; padding: 4px 12px; border-radius: 7px; border: none; cursor: pointer; font-family: inherit;">
-                        All Catalog Courses (<?= count($subjects) ?>)
-                    </button>
-                </div>
-            </div>
-
-            <!-- Student Profile Badge -->
-            <div style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.78rem; font-weight: 600; color: #3b5343; background: #f3f7f4; padding: 6px 14px; border-radius: 999px; border: 1px solid #dce8de;">
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+        <!-- Left Card: Circular Overall Progress -->
+        <div class="curriculum-stat-card" style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 22px; padding: 22px 28px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 24px;">
+            <!-- Circular Progress Ring (67%) -->
+            <div style="position: relative; width: 84px; height: 84px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                <svg width="84" height="84" viewBox="0 0 88 88" style="transform: rotate(-90deg);">
+                    <!-- Background Circle -->
+                    <circle cx="44" cy="44" r="35" stroke="#e2ece4" stroke-width="7.5" fill="none" />
+                    <!-- Progress Arc (67% of 219.9 = 147.3 dasharray, 72.6 dashoffset) -->
+                    <circle cx="44" cy="44" r="35" stroke="#1c4b32" stroke-width="7.5" stroke-linecap="round" fill="none"
+                            stroke-dasharray="219.9" stroke-dashoffset="72.6" style="transition: stroke-dashoffset 0.8s ease;" />
                 </svg>
-                <span><?= htmlspecialchars($student['class_name'] ?? 'TE Computer') ?></span>
-                <span>•</span>
-                <span>Roll: <?= htmlspecialchars($student['roll_no'] ?? 'COMP-2026-001') ?></span>
-                <span>•</span>
-                <span style="font-weight: 700; color: #1c4b32;">Shantanu</span>
+                <div style="position: absolute; text-align: center;">
+                    <span style="font-size: 1.32rem; font-weight: 800; color: #183324; line-height: 1;">67%</span>
+                </div>
+            </div>
+
+            <!-- Overall Progress Info & Bar -->
+            <div style="flex: 1; min-width: 0;">
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #183324; margin: 0 0 2px 0;">Overall Progress</h3>
+                <p style="font-size: 0.82rem; color: #627467; margin: 0 0 10px 0; font-weight: 500;">Across All Tracks</p>
+                <div style="width: 140px; max-width: 100%; height: 6px; background: #e2ece4; border-radius: 999px; overflow: hidden;">
+                    <div style="width: 67%; height: 100%; background: #1c4b32; border-radius: 999px;"></div>
+                </div>
             </div>
         </div>
 
-        <!-- Clean Course Pills Grid -->
-        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;" id="track-pills-container">
-            <?php foreach ($subjects as $s): ?>
-                <?php 
-                    $code = $s['code'];
-                    $isActive = ($code === $selectedTrack);
-                    $isSubEnrolled = in_array($code, $enrolledList, true);
-                ?>
-                <a href="/student/curriculum?track=<?= urlencode($code) ?>" 
-                   class="track-pill-item <?= $isSubEnrolled ? 'is-enrolled' : 'is-catalog' ?>"
-                   style="padding: 7px 14px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; text-decoration: none; transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 8px; border: 1px solid; <?= $isActive ? 'background: #1c4b32; color: #ffffff; border-color: #1c4b32; box-shadow: 0 3px 8px rgba(28,75,50,0.25);' : ($isSubEnrolled ? 'background: #f7faf8; color: #234f36; border-color: #d1e2d4;' : 'background: #ffffff; color: #627467; border-color: #e2e8e3;') ?>">
-                    
-                    <!-- Code Tag -->
-                    <span style="font-size: 0.72rem; font-weight: 800; padding: 2px 6px; border-radius: 6px; <?= $isActive ? 'background: rgba(255,255,255,0.2); color: #fff;' : ($isSubEnrolled ? 'background: #e2ede5; color: #1c4b32;' : 'background: #f1f3f1; color: #7a8d80;') ?>">
-                        <?= htmlspecialchars($code) ?>
-                    </span>
+        <!-- Right Card: 3 Primary Metrics with Dividers -->
+        <div class="curriculum-stat-card" style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 22px; padding: 22px 28px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-around;">
+            
+            <!-- Metric 1: Enrolled Tracks -->
+            <div style="display: flex; flex-direction: column; gap: 4px; padding: 0 10px;">
+                <span style="font-size: 1.85rem; font-weight: 800; color: #183324; line-height: 1.1;">8</span>
+                <span style="font-size: 0.82rem; font-weight: 500; color: #627467;">Enrolled Tracks</span>
+            </div>
 
-                    <!-- Course Title -->
-                    <span style="line-height: 1.2;"><?= htmlspecialchars($s['name']) ?></span>
+            <div style="width: 1px; height: 44px; background: #edf2ed;"></div>
 
-                    <!-- Enrolled vs Buy Tag -->
-                    <?php if ($isSubEnrolled): ?>
-                        <span style="font-size: 0.66rem; font-weight: 700; padding: 1px 6px; border-radius: 999px; <?= $isActive ? 'background: #2ecc71; color: #143e26;' : 'background: #e8f5e9; color: #2e7d32;' ?>">
-                            ✓ Enrolled
-                        </span>
-                    <?php else: ?>
-                        <span style="font-size: 0.66rem; font-weight: 700; padding: 1px 6px; border-radius: 999px; <?= $isActive ? 'background: #fef3c7; color: #92400e;' : 'background: #fffbeb; color: #b45309; border: 1px solid #fde68a;' ?>">
-                            🔒 Buy
-                        </span>
-                    <?php endif; ?>
-                </a>
-            <?php endforeach; ?>
+            <!-- Metric 2: Completed Labs -->
+            <div style="display: flex; flex-direction: column; gap: 4px; padding: 0 10px;">
+                <span style="font-size: 1.85rem; font-weight: 800; color: #183324; line-height: 1.1;">46</span>
+                <span style="font-size: 0.82rem; font-weight: 500; color: #627467;">Completed Labs</span>
+            </div>
+
+            <div style="width: 1px; height: 44px; background: #edf2ed;"></div>
+
+            <!-- Metric 3: Pending Labs -->
+            <div style="display: flex; flex-direction: column; gap: 4px; padding: 0 10px;">
+                <span style="font-size: 1.85rem; font-weight: 800; color: #183324; line-height: 1.1;">12</span>
+                <span style="font-size: 0.82rem; font-weight: 500; color: #627467;">Pending Labs</span>
+            </div>
+
         </div>
 
     </div>
 
-    <!-- Active Course Overview Banner -->
-    <div style="background: <?= $isEnrolled ? 'linear-gradient(135deg, #1c4b32 0%, #285f43 100%)' : 'linear-gradient(135deg, #2c3e35 0%, #3f5549 100%)' ?>; border-radius: 20px; padding: 24px 28px; color: #ffffff; box-shadow: 0 4px 14px rgba(28, 75, 50, 0.12); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+    <!-- Filter Tabs Row matching mockup -->
+    <div class="curriculum-filter-tabs" style="display: flex; align-items: center; gap: 32px; border-bottom: 1px solid #e2ece4; margin-top: 8px; padding-bottom: 0;">
+        <button id="tab-all" class="filter-tab-btn active" onclick="switchCurriculumTab('all')"
+                style="background: transparent; border: none; padding: 8px 4px 12px 4px; font-size: 0.92rem; font-weight: 700; color: #183324; border-bottom: 3px solid #1c4b32; margin-bottom: -1px; cursor: pointer; font-family: inherit; transition: all 0.2s ease;">
+            All Tracks
+        </button>
+        <button id="tab-in-progress" class="filter-tab-btn" onclick="switchCurriculumTab('in-progress')"
+                style="background: transparent; border: none; padding: 8px 4px 12px 4px; font-size: 0.92rem; font-weight: 500; color: #627467; border-bottom: 3px solid transparent; margin-bottom: -1px; cursor: pointer; font-family: inherit; transition: all 0.2s ease;">
+            In Progress
+        </button>
+        <button id="tab-completed" class="filter-tab-btn" onclick="switchCurriculumTab('completed')"
+                style="background: transparent; border: none; padding: 8px 4px 12px 4px; font-size: 0.92rem; font-weight: 500; color: #627467; border-bottom: 3px solid transparent; margin-bottom: -1px; cursor: pointer; font-family: inherit; transition: all 0.2s ease;">
+            Completed
+        </button>
+    </div>
+
+    <!-- Main Tracks List Container matching mockup -->
+    <div id="tracks-list-card" style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 22px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); overflow: hidden;">
         
-        <div>
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-                <span style="background: rgba(255,255,255,0.2); color: #ffffff; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 6px;">
-                    <?= htmlspecialchars($activeSubject['code'] ?? 'CYB302') ?>
-                </span>
-                <span style="font-size: 0.76rem; color: #c4decb; font-weight: 600;">
-                    <?= htmlspecialchars($activeSubject['department_name'] ?? 'Computer Engineering') ?> • <?= (int)($activeSubject['credits'] ?? 4) ?> Credits
-                </span>
-                <?php if ($isEnrolled): ?>
-                    <span style="background: #2ecc71; color: #103820; font-size: 0.7rem; font-weight: 800; padding: 2px 8px; border-radius: 999px;">
-                        ✓ Enrolled & Active
-                    </span>
-                <?php else: ?>
-                    <span style="background: #f59e0b; color: #ffffff; font-size: 0.7rem; font-weight: 800; padding: 2px 8px; border-radius: 999px;">
-                        🔒 Syllabus Preview (Not Enrolled)
-                    </span>
-                <?php endif; ?>
-            </div>
-
-            <h2 style="font-size: 1.5rem; font-weight: 800; margin: 0 0 6px 0; font-family: 'Newsreader', Georgia, serif; letter-spacing: -0.3px;">
-                <?= htmlspecialchars($activeSubject['name'] ?? 'Ethical Hacking & Penetration Testing') ?>
-            </h2>
-
-            <p style="font-size: 0.84rem; color: #d6ebd9; margin: 0; max-width: 650px; line-height: 1.45;">
-                <?php if ($isEnrolled): ?>
-                    Lead Mentor: <strong><?= htmlspecialchars($activeSubject['instructor_name'] ?? 'Prof. Robert Miller') ?></strong>. All 4 curriculum modules, hands-on Linux terminal sandboxes, and verification quizzes are unlocked for your profile.
-                <?php else: ?>
-                    Lead Mentor: <strong><?= htmlspecialchars($activeSubject['instructor_name'] ?? 'Prof. Robert Miller') ?></strong>. You are currently viewing the course syllabus in preview mode. Enroll to unlock interactive virtual labs, terminal exercises, and verified certificate credentials.
-                <?php endif; ?>
-            </p>
-        </div>
-
-        <div>
-            <?php if ($isEnrolled): ?>
-                <?php
-                    $totalMod = count($modules);
-                    $sumProgress = array_reduce($modules, fn($c, $m) => $c + (int)($m['progress'] ?? 0), 0);
-                    $avgProgress = $totalMod > 0 ? round($sumProgress / $totalMod) : 0;
-                ?>
-                <div style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 14px; padding: 14px 18px; text-align: center; min-width: 170px;">
-                    <div style="font-size: 0.72rem; color: #c4decb; font-weight: 600; margin-bottom: 4px;">Track Progress</div>
-                    <div style="font-size: 1.6rem; font-weight: 800; color: #ffffff; line-height: 1;"><?= $avgProgress ?>%</div>
-                    <div style="background: rgba(255,255,255,0.25); height: 5px; border-radius: 3px; overflow: hidden; margin-top: 8px;">
-                        <div style="background: #2ecc71; height: 100%; width: <?= $avgProgress ?>%;"></div>
-                    </div>
-                </div>
-            <?php else: ?>
-                <button onclick="openPurchaseModal()" style="background: #f59e0b; color: #1c2b20; border: none; padding: 12px 24px; border-radius: 12px; font-size: 0.88rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); display: inline-flex; align-items: center; gap: 8px; transition: all 0.15s ease;" onmouseover="this.style.background='#d97706'; this.style.transform='translateY(-1px)';" onmouseout="this.style.background='#f59e0b'; this.style.transform='none';">
-                    <span>⚡ Buy & Unlock Course — <?= htmlspecialchars($coursePrice) ?></span>
-                </button>
-            <?php endif; ?>
-        </div>
-
-    </div>
-
-    <!-- 2x2 Curriculum Module Cards Grid -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 24px;">
-        <?php foreach ($modules as $modIndex => $mod): ?>
-            <?php
-                $pct = $isEnrolled ? (int)($mod['progress'] ?? 0) : 0;
-                $radius = 21;
-                $circumference = 2 * M_PI * $radius; // ~131.95
-                $dashoffset = $circumference - ($circumference * ($pct / 100));
+        <?php foreach ($allTracks as $index => $t): ?>
+            <?php 
+                $code = $t['code'];
+                $isEnrolled = $t['is_enrolled'] ?? in_array($code, $enrolledList, true);
+                $prog = (int)($t['display_progress'] ?? $t['progress']);
+                $statusType = ($prog === 100) ? 'completed' : (($prog > 0) ? 'in-progress' : 'not-started');
+                $isLast = ($index === count($allTracks) - 1);
             ?>
-            <div style="background: #ffffff; border: 1px solid #d5e0d5; border-radius: 20px; padding: 24px 26px; box-shadow: 0 2px 8px rgba(33, 75, 52, 0.04); display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.15s ease, box-shadow 0.15s ease;">
+            <div class="track-row-wrapper" data-track-code="<?= htmlspecialchars($code) ?>" data-status="<?= $statusType ?>" data-progress="<?= $prog ?>" style="<?= !$isLast ? 'border-bottom: 1px solid #edf2ed;' : '' ?>">
                 
-                <!-- Card Header: Title & Circular Donut Progress Gauge -->
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px;">
-                    <div>
-                        <span style="font-size: 0.72rem; font-weight: 800; color: #2d6a4f; text-transform: uppercase; letter-spacing: 0.5px;">Module <?= (int)$mod['number'] ?></span>
-                        <h3 style="font-size: 1.1rem; font-weight: 700; color: #163622; line-height: 1.35; margin: 3px 0 0 0;">
-                            <?= htmlspecialchars($mod['title']) ?>
-                        </h3>
+                <!-- Main Horizontal Track Row -->
+                <div class="track-row-item" style="padding: 18px 26px; display: flex; align-items: center; justify-content: space-between; gap: 20px; transition: background 0.15s ease;">
+                    
+                    <!-- Left: Soft Green Icon Badge + Track Title & Subtitle -->
+                    <div style="display: flex; align-items: center; gap: 18px; min-width: 0; flex: 1;">
+                        <!-- Icon Badge 48x48 in #d7e8db -->
+                        <div class="track-icon-badge" style="width: 48px; height: 48px; min-width: 48px; border-radius: 14px; background: #d7e8db; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <?php if ($t['icon'] === 'shield'): ?>
+                                <!-- Shield Icon for Network Defense Essentials -->
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                    <path d="M9 12l2 2 4-4"/>
+                                </svg>
+                            <?php elseif ($t['icon'] === 'hacker'): ?>
+                                <!-- Hacker / Silhouette Avatar for Ethical Hacking -->
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="12" cy="7" r="4"/>
+                                    <path d="M4 14l2-2m14 0l-2-2"/>
+                                </svg>
+                            <?php elseif ($t['icon'] === 'key'): ?>
+                                <!-- Key Icon for Cryptographic & Data Security -->
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="7.5" cy="15.5" r="4.5"/>
+                                    <path d="M10.7 12.3L19 4"/>
+                                    <path d="M15 4l4 4"/>
+                                    <path d="M17 6l2-2"/>
+                                </svg>
+                            <?php elseif ($t['icon'] === 'forensics'): ?>
+                                <!-- Siren / Forensics Radar Icon for Incident Response -->
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                                    <circle cx="12" cy="8" r="1.5" fill="#1c4b32"/>
+                                </svg>
+                            <?php elseif ($t['icon'] === 'database'): ?>
+                                <!-- Database Cylinders for DBMS -->
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                                </svg>
+                            <?php elseif ($t['icon'] === 'network'): ?>
+                                <!-- Network Topology Nodes for Computer Networks -->
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="2" y="2" width="6" height="6" rx="1"/>
+                                    <rect x="16" y="2" width="6" height="6" rx="1"/>
+                                    <rect x="9" y="16" width="6" height="6" rx="1"/>
+                                    <path d="M5 8v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8"/>
+                                    <path d="M12 13v3"/>
+                                </svg>
+                            <?php elseif ($t['icon'] === 'theory'): ?>
+                                <!-- Finite Automata Graph for Theory of Computation -->
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="6" cy="6" r="3"/>
+                                    <circle cx="18" cy="6" r="3"/>
+                                    <circle cx="12" cy="18" r="3"/>
+                                    <path d="M8.5 7.5L15.5 7.5"/>
+                                    <path d="M7.5 8.5L10.5 15.5"/>
+                                    <path d="M16.5 8.5L13.5 15.5"/>
+                                </svg>
+                            <?php else: ?>
+                                <!-- Web Browser & ERP System Icon -->
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1c4b32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="2" y1="12" x2="22" y2="12"/>
+                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                                </svg>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Titles -->
+                        <div style="min-width: 0;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <h4 class="track-title-text" style="font-size: 0.96rem; font-weight: 700; color: #183324; margin: 0; line-height: 1.25;">
+                                    <?= htmlspecialchars($t['name']) ?>
+                                </h4>
+                                <span style="font-size: 0.7rem; font-weight: 700; color: #5a7061; background: #eaf1eb; padding: 1px 6px; border-radius: 6px;">
+                                    <?= htmlspecialchars($code) ?>
+                                </span>
+                            </div>
+                            <p class="track-subtitle-text" style="font-size: 0.8rem; color: #627467; margin: 3px 0 0 0; line-height: 1.3;">
+                                <?= htmlspecialchars($t['subtitle']) ?>
+                            </p>
+                        </div>
                     </div>
 
-                    <!-- Circular Progress Gauge Badge -->
-                    <div style="position: relative; width: 54px; height: 54px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                    <!-- Right: Progress Bar + Percentage + Pill Button -->
+                    <div style="display: flex; align-items: center; gap: 24px; flex-shrink: 0;">
+                        
+                        <!-- Horizontal Progress Bar (240px) -->
+                        <div class="track-progress-bar-wrap" style="width: 240px; height: 6px; background: #e2ece4; border-radius: 999px; overflow: hidden;">
+                            <div style="width: <?= $prog ?>%; height: 100%; background: #1c4b32; border-radius: 999px; transition: width 0.4s ease;"></div>
+                        </div>
+
+                        <!-- Percentage Label -->
+                        <span style="font-size: 0.86rem; font-weight: 700; color: #183324; width: 44px; text-align: right; flex-shrink: 0;">
+                            <?= $prog ?>%
+                        </span>
+
+                        <!-- Action Pill Button -->
                         <?php if ($isEnrolled): ?>
-                            <svg width="54" height="54" viewBox="0 0 54 54" style="transform: rotate(-90deg);">
-                                <circle cx="27" cy="27" r="<?= $radius ?>" stroke="#dbe7dc" stroke-width="4.5" fill="none" />
-                                <circle cx="27" cy="27" r="<?= $radius ?>" 
-                                        stroke="#245a3e" 
-                                        stroke-width="4.5" 
-                                        stroke-linecap="round" 
-                                        fill="none" 
-                                        stroke-dasharray="<?= round($circumference, 2) ?>" 
-                                        stroke-dashoffset="<?= round($dashoffset, 2) ?>" 
-                                        style="transition: stroke-dashoffset 0.6s ease;" />
-                            </svg>
-                            <span style="position: absolute; font-size: 0.82rem; font-weight: 800; color: #163622;">
-                                <?= $pct ?>%
-                            </span>
+                            <button type="button" class="action-pill-btn btn-continue" onclick="toggleTrackDrawer('<?= htmlspecialchars($code) ?>')" 
+                                    style="padding: 7px 20px; border-radius: 999px; background: #eaf1eb; color: #1c4b32; font-weight: 600; font-size: 0.83rem; border: 1px solid #d4e2d6; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease; font-family: inherit;">
+                                <span>Continue</span>
+                                <span style="font-size: 0.95rem;">&rarr;</span>
+                            </button>
                         <?php else: ?>
-                            <div style="width: 44px; height: 44px; border-radius: 50%; background: #fef3c7; color: #92400e; display: flex; align-items: center; justify-content: center; font-size: 1rem;" title="Locked: Purchase course to access">
-                                🔒
-                            </div>
+                            <button type="button" class="action-pill-btn btn-buy" onclick="openPurchaseModal('<?= htmlspecialchars($code) ?>', '<?= htmlspecialchars(addslashes($t['name'])) ?>', '<?= htmlspecialchars($t['price']) ?>')" 
+                                    style="padding: 7px 20px; border-radius: 999px; background: #fdf6ea; color: #92580a; font-weight: 600; font-size: 0.83rem; border: 1px solid #f6deb3; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease; font-family: inherit;">
+                                <span>Buy Course</span>
+                                <span style="font-size: 0.95rem;">&rarr;</span>
+                            </button>
                         <?php endif; ?>
+
                     </div>
+
                 </div>
 
-                <!-- Card Body: Left Graphic Illustration & Right Lessons Checklist -->
-                <div style="display: flex; align-items: flex-start; gap: 20px; flex: 1;">
+                <!-- Expandable Modules Drawer (Opens on "Continue" or Click) -->
+                <div id="drawer-<?= htmlspecialchars($code) ?>" class="track-modules-drawer" style="display: none; background: #f8faf8; border-top: 1px solid #edf2ed; padding: 22px 26px 26px 26px;">
                     
-                    <!-- Left Graphic Illustration -->
-                    <div style="width: 135px; height: 130px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border-radius: 12px; background: #f8faf8; border: 1px solid #edf2ed; overflow: hidden; padding: 4px;">
-                        <img src="<?= htmlspecialchars($mod['image']) ?>" 
-                             alt="<?= htmlspecialchars($mod['title']) ?>" 
-                             style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                    <!-- Drawer Header with Syllabus Info -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid #e7efe9;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 0.74rem; font-weight: 800; color: #1c4b32; background: #d7e8db; padding: 2px 8px; border-radius: 6px;">
+                                    <?= htmlspecialchars($code) ?> SYLLABUS
+                                </span>
+                                <span style="font-size: 0.82rem; font-weight: 600; color: #3b5343;">
+                                    Mentor: <?= htmlspecialchars($t['instructor_name'] ?? 'Prof. Robert Miller') ?>
+                                </span>
+                                <span style="color: #9ab0a0;">•</span>
+                                <span style="font-size: 0.82rem; color: #627467;">
+                                    Credits: <?= htmlspecialchars($t['credits'] ?? 4) ?>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <?php if ($isEnrolled): ?>
+                                <span style="font-size: 0.74rem; font-weight: 700; color: #2e7d32; background: #e8f5e9; padding: 3px 10px; border-radius: 999px; border: 1px solid #c8e6c9;">
+                                    ✓ Enrolled Track (All Modules Unlocked)
+                                </span>
+                            <?php else: ?>
+                                <span style="font-size: 0.74rem; font-weight: 700; color: #b45309; background: #fffbeb; padding: 3px 10px; border-radius: 999px; border: 1px solid #fde68a;">
+                                    🔒 Preview Mode (Requires Purchase to Access)
+                                </span>
+                            <?php endif; ?>
+                            <button onclick="toggleTrackDrawer('<?= htmlspecialchars($code) ?>')" style="background: transparent; border: none; font-size: 0.8rem; font-weight: 600; color: #627467; cursor: pointer;">
+                                Close ✕
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Right Lessons Checklist -->
-                    <div style="display: flex; flex-direction: column; gap: 11px; flex: 1; min-width: 0;">
-                        <?php foreach (($mod['lessons'] ?? []) as $lesson): ?>
-                            <?php 
-                                $status = $isEnrolled ? ($lesson['status'] ?? 'not_started') : 'locked'; 
-                                $isDone = ($status === 'completed');
-                                $isInProgress = ($status === 'in_progress');
-                            ?>
-                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 0.82rem; font-weight: 600; color: #1e3526;">
+                    <!-- 4 Modules Grid for this Track -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                        <?php 
+                            $modules = $t['modules'] ?? [];
+                            foreach ($modules as $mod): 
+                                $modNum = $mod['number'] ?? 1;
+                                $modProgress = $mod['progress'] ?? 0;
+                                $lessons = $mod['lessons'] ?? [];
+                        ?>
+                            <div class="module-card-box" style="background: #ffffff; border: 1px solid #e2ece4; border-radius: 16px; padding: 18px 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.02); transition: transform 0.15s ease, box-shadow 0.15s ease;">
                                 
-                                <!-- Icon & Lesson Name -->
-                                <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
-                                    <?php if ($isDone): ?>
-                                        <span style="width: 16px; height: 16px; border-radius: 50%; background: #2d6a4f; display: inline-flex; align-items: center; justify-content: center; color: #ffffff; flex-shrink: 0; font-size: 0.65rem;">
-                                            ✓
+                                <div>
+                                    <!-- Module Number & Progress Badge -->
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <span style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #5a7061;">
+                                            Module <?= $modNum ?>
                                         </span>
-                                    <?php elseif ($isInProgress): ?>
-                                        <span style="width: 16px; height: 16px; border: 1.5px dashed #2d6a4f; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; background: #eef6f0;">
-                                        </span>
-                                    <?php else: ?>
-                                        <span style="width: 16px; height: 16px; border: 1.5px solid #a3b8a6; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                        </span>
-                                    <?php endif; ?>
+                                        <?php if ($modProgress === 100): ?>
+                                            <span style="font-size: 0.7rem; font-weight: 700; background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 999px;">
+                                                100% Completed
+                                            </span>
+                                        <?php elseif ($modProgress > 0): ?>
+                                            <span style="font-size: 0.7rem; font-weight: 700; background: #eaf1eb; color: #1c4b32; padding: 2px 8px; border-radius: 999px;">
+                                                <?= $modProgress ?>% In Progress
+                                            </span>
+                                        <?php else: ?>
+                                            <span style="font-size: 0.7rem; font-weight: 600; background: #f5f7f5; color: #7a8d80; padding: 2px 8px; border-radius: 999px;">
+                                                Not Started
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
 
-                                    <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; <?= $isDone ? 'color: #1a3323;' : ($isInProgress ? 'color: #1e3526; font-weight: 700;' : 'color: #425b49;') ?>">
-                                        <?= htmlspecialchars($lesson['code'] . ' ' . $lesson['title']) ?>
-                                    </span>
+                                    <!-- Module Title -->
+                                    <h5 style="font-size: 0.92rem; font-weight: 700; color: #183324; margin: 0 0 10px 0; line-height: 1.3;">
+                                        <?= htmlspecialchars($mod['title']) ?>
+                                    </h5>
+
+                                    <!-- Lessons List Preview -->
+                                    <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px;">
+                                        <?php foreach ($lessons as $l): ?>
+                                            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.76rem; color: #435b4b; background: #f8faf8; padding: 5px 10px; border-radius: 8px;">
+                                                <div style="display: flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                    <span style="font-weight: 700; color: #1c4b32;"><?= htmlspecialchars($l['code']) ?></span>
+                                                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($l['title']) ?></span>
+                                                </div>
+                                                <span style="color: #7a8d80; font-size: 0.7rem; flex-shrink: 0;"><?= htmlspecialchars($l['duration']) ?></span>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
                                 </div>
 
-                                <!-- Right Status Indicator -->
-                                <div style="flex-shrink: 0; font-size: 0.74rem;">
-                                    <?php if ($isDone): ?>
-                                        <span style="color: #2d6a4f; font-weight: 700;">Done</span>
-                                    <?php elseif ($isInProgress): ?>
-                                        <span style="color: #2563eb; font-weight: 700;">In Progress</span>
-                                    <?php elseif ($isEnrolled): ?>
-                                        <span style="color: #7b9181; font-weight: 500;">Ready</span>
-                                    <?php else: ?>
-                                        <span style="color: #b45309; font-weight: 600;">Preview</span>
-                                    <?php endif; ?>
-                                </div>
+                                <!-- Action Button: Open Interactive Learning Modal or Buy -->
+                                <?php if ($isEnrolled): ?>
+                                    <button type="button" onclick="openLearningModal('<?= htmlspecialchars($code) ?>', <?= (int)$modNum ?>)"
+                                            style="width: 100%; padding: 8px 14px; border-radius: 10px; background: #1c4b32; color: #ffffff; border: none; font-weight: 600; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.15s ease; font-family: inherit;">
+                                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <span>Start Learning / Review</span>
+                                    </button>
+                                <?php else: ?>
+                                    <button type="button" onclick="openPurchaseModal('<?= htmlspecialchars($code) ?>', '<?= htmlspecialchars(addslashes($t['name'])) ?>', '<?= htmlspecialchars($t['price']) ?>')"
+                                            style="width: 100%; padding: 8px 14px; border-radius: 10px; background: #fef3c7; color: #92400e; border: 1px solid #fde68a; font-weight: 600; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit;">
+                                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                        <span>Unlock Course to Access (<?= htmlspecialchars($t['price']) ?>)</span>
+                                    </button>
+                                <?php endif; ?>
 
                             </div>
                         <?php endforeach; ?>
@@ -250,442 +340,485 @@ $enrolledList = $enrolledCourses ?? ['CYB301', 'CYB302', 'CYB303', 'CYB304'];
 
                 </div>
 
-                <!-- Card Bottom Row: Interactive Learning Button or Buy Button -->
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 14px; border-top: 1px solid #edf3ed;">
-                    <span style="font-size: 0.74rem; color: #627467;">
-                        <?= count($mod['lessons'] ?? []) ?> Structured Lessons & Practical Labs
-                    </span>
-
-                    <?php if ($isEnrolled): ?>
-                        <button onclick="openLearningModal(<?= $modIndex ?>)" 
-                                style="background: #153e28; color: #ffffff; padding: 8px 20px; border-radius: 10px; font-size: 0.82rem; font-weight: 700; border: none; cursor: pointer; box-shadow: 0 2px 6px rgba(21, 62, 40, 0.2); transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 6px; font-family: inherit;" 
-                                onmouseover="this.style.background='#1b4d32'; this.style.transform='translateY(-1px)';" 
-                                onmouseout="this.style.background='#153e28'; this.style.transform='none';">
-                            <span><?= htmlspecialchars($mod['action_label'] ?? 'Start Learning') ?></span>
-                            <span>&rarr;</span>
-                        </button>
-                    <?php else: ?>
-                        <button onclick="openPurchaseModal()" 
-                                style="background: #fffbeb; color: #92400e; border: 1px solid #fde68a; padding: 7px 18px; border-radius: 10px; font-size: 0.8rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease; font-family: inherit;"
-                                onmouseover="this.style.background='#fef3c7';"
-                                onmouseout="this.style.background='#fffbeb';">
-                            <span>🔒 Unlock with Course</span>
-                            <span>(<?= htmlspecialchars($coursePrice) ?>)</span>
-                        </button>
-                    <?php endif; ?>
-                </div>
-
             </div>
         <?php endforeach; ?>
+
     </div>
 
 </div>
 
-<!-- ========================================================= -->
-<!-- INTERACTIVE LEARNING MODAL (Study Viewer & Sandbox Labs) -->
-<!-- ========================================================= -->
-<div id="learningModal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(12, 28, 18, 0.65); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 18px;">
+<!-- ==================================================== -->
+<!-- INTERACTIVE LEARNING MODAL (Study Notes, Sandbox & Commands) -->
+<!-- ==================================================== -->
+<div id="learningModal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(18, 38, 26, 0.65); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 20px;">
     
-    <div style="background: #ffffff; width: 100%; max-width: 960px; max-height: 90vh; border-radius: 22px; box-shadow: 0 16px 40px rgba(0,0,0,0.22); border: 1px solid #cfe2d3; display: flex; flex-direction: column; overflow: hidden; animation: modalPop 0.2s ease-out;">
+    <div style="background: #ffffff; border-radius: 24px; width: 100%; max-width: 980px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: modalFadeIn 0.2s ease-out;">
         
-        <!-- Modal Top Bar -->
-        <div style="background: #1c4b32; color: #ffffff; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #153e28;">
-            <div>
-                <span id="modal-track-badge" style="background: rgba(255,255,255,0.2); font-size: 0.72rem; font-weight: 800; padding: 2px 7px; border-radius: 5px;">
+        <!-- Modal Top Header -->
+        <div style="background: #1c4b32; color: #ffffff; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span id="lm-track-code" style="background: rgba(255,255,255,0.2); font-size: 0.74rem; font-weight: 800; padding: 3px 8px; border-radius: 6px;">
                     CYB302
                 </span>
-                <h3 id="modal-module-title" style="font-size: 1.15rem; font-weight: 800; margin: 4px 0 0 0; line-height: 1.3;">
-                    Module Title
-                </h3>
-            </div>
-            
-            <div style="display: flex; align-items: center; gap: 14px;">
-                <span id="modal-module-progress" style="background: #2ecc71; color: #113a21; font-size: 0.74rem; font-weight: 800; padding: 3px 10px; border-radius: 999px;">
-                    75% Completed
-                </span>
-                <button onclick="closeLearningModal()" style="background: rgba(255,255,255,0.15); border: none; color: #ffffff; width: 32px; height: 32px; border-radius: 50%; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
-                    ✕
-                </button>
-            </div>
-        </div>
-
-        <!-- Modal Split Content: Left Lesson Index + Right Technical Material -->
-        <div style="display: flex; flex: 1; min-height: 0; overflow: hidden;">
-            
-            <!-- Left Pane: Lessons Navigation -->
-            <div style="width: 290px; background: #f7faf8; border-right: 1px solid #dce8de; overflow-y: auto; padding: 16px 14px; display: flex; flex-direction: column; gap: 8px;" id="modal-lessons-list">
-                <!-- Dynamically populated via JS -->
-            </div>
-
-            <!-- Right Pane: Active Lesson Technical Content -->
-            <div style="flex: 1; overflow-y: auto; padding: 24px 30px; display: flex; flex-direction: column; gap: 20px; background: #ffffff;" id="modal-lesson-body">
-                
-                <!-- Lesson Header -->
                 <div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <span id="active-lesson-code" style="font-size: 0.74rem; font-weight: 800; color: #2d6a4f; text-transform: uppercase;">
-                            LESSON 2.1
-                        </span>
-                        <span id="active-lesson-duration" style="font-size: 0.72rem; color: #7a8d80; font-weight: 600;">
-                            30 mins
-                        </span>
-                    </div>
-                    <h2 id="active-lesson-title" style="font-size: 1.35rem; font-weight: 800; color: #143722; margin: 0; font-family: 'Newsreader', Georgia, serif;">
-                        Understanding Packet Tracing & Flags
-                    </h2>
-                </div>
-
-                <!-- Summary Box -->
-                <div style="background: #f4f8f5; border-left: 4px solid #2d6a4f; padding: 12px 16px; border-radius: 4px 10px 10px 4px;">
-                    <h5 style="font-size: 0.74rem; font-weight: 800; text-transform: uppercase; color: #2d6a4f; margin: 0 0 4px 0; letter-spacing: 0.5px;">Executive Overview</h5>
-                    <p id="active-lesson-summary" style="font-size: 0.82rem; color: #375040; margin: 0; line-height: 1.45;">
-                        Overview text...
-                    </p>
-                </div>
-
-                <!-- Key Concepts -->
-                <div>
-                    <h4 style="font-size: 0.88rem; font-weight: 700; color: #163622; margin: 0 0 8px 0;">
-                        Key Technical Takeaways
-                    </h4>
-                    <ul id="active-lesson-keypoints" style="margin: 0; padding-left: 20px; font-size: 0.82rem; color: #435b4b; line-height: 1.55; display: flex; flex-direction: column; gap: 6px;">
-                        <!-- Injected via JS -->
-                    </ul>
-                </div>
-
-                <!-- Command / Terminal Box -->
-                <div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <h4 style="font-size: 0.88rem; font-weight: 700; color: #163622; margin: 0;">
-                            CLI / Terminal Reference Command
-                        </h4>
-                        <button onclick="copyCommand()" id="copy-btn" style="background: #eef3ee; border: 1px solid #d5e2d6; color: #1c4b32; font-size: 0.72rem; font-weight: 700; padding: 3px 9px; border-radius: 6px; cursor: pointer;">
-                            Copy Syntax
-                        </button>
-                    </div>
-                    <pre id="active-lesson-commands" style="background: #112417; color: #4ade80; padding: 14px 16px; border-radius: 10px; font-family: 'Consolas', 'Fira Code', monospace; font-size: 0.8rem; overflow-x: auto; margin: 0; line-height: 1.45;"></pre>
-                </div>
-
-                <!-- Hands-on Lab Exercise -->
-                <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 14px 16px;">
-                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                        <span style="font-size: 0.76rem; font-weight: 800; color: #1e40af; text-transform: uppercase;">
-                            ⚡ Practical Lab Exercise
-                        </span>
-                    </div>
-                    <p id="active-lesson-lab" style="font-size: 0.82rem; color: #1e3a8a; margin: 0; line-height: 1.45;">
-                        Lab instructions...
-                    </p>
-                </div>
-
-                <!-- Footer Action Controls -->
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 16px; border-top: 1px solid #edf2ed;">
-                    <button onclick="toggleLessonCompletion()" id="btn-toggle-complete" style="background: #e8f5e9; color: #1e4620; border: 1px solid #a8dab5; padding: 8px 16px; border-radius: 9px; font-size: 0.8rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-family: inherit;">
-                        <span id="complete-check-icon">✓</span>
-                        <span id="complete-btn-text">Mark Lesson Completed</span>
-                    </button>
-
-                    <div style="display: flex; gap: 10px;">
-                        <a href="/student/live-class" style="background: #1c4b32; color: #ffffff; text-decoration: none; padding: 8px 16px; border-radius: 9px; font-size: 0.8rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(28, 75, 50, 0.2);">
-                            <span>Launch Virtual Lab ↗</span>
-                        </a>
-                        <button onclick="nextLesson()" style="background: #f0f6f1; color: #2d6a4f; border: 1px solid #cfe0d2; padding: 8px 16px; border-radius: 9px; font-size: 0.8rem; font-weight: 700; cursor: pointer; font-family: inherit;">
-                            Next Lesson &rarr;
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- ========================================================= -->
-<!-- COURSE PURCHASE / UNLOCK MODAL                           -->
-<!-- ========================================================= -->
-<div id="purchaseModal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(12, 28, 18, 0.65); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 18px;">
-    
-    <div style="background: #ffffff; width: 100%; max-width: 520px; border-radius: 22px; box-shadow: 0 16px 40px rgba(0,0,0,0.22); border: 1px solid #cfe2d3; padding: 28px; display: flex; flex-direction: column; gap: 20px; animation: modalPop 0.2s ease-out;">
-        
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="width: 44px; height: 44px; border-radius: 12px; background: #fef3c7; color: #92400e; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
-                    🎓
-                </div>
-                <div>
-                    <span style="font-size: 0.72rem; font-weight: 800; color: #2d6a4f; text-transform: uppercase;">
-                        Instant Course Enrollment
-                    </span>
-                    <h3 style="font-size: 1.25rem; font-weight: 800; color: #153e28; margin: 2px 0 0 0; line-height: 1.25;">
-                        <?= htmlspecialchars($activeSubject['name']) ?>
+                    <h3 id="lm-modal-title" style="font-size: 1.05rem; font-weight: 700; margin: 0; line-height: 1.2;">
+                        Module 1: Reconnaissance & OSINT
                     </h3>
+                    <p id="lm-track-name" style="font-size: 0.78rem; color: #c4decb; margin: 2px 0 0 0;">
+                        Ethical Hacking & Pen Testing
+                    </p>
                 </div>
             </div>
-            <button onclick="closePurchaseModal()" style="background: #f0f6f1; border: none; color: #2d6a4f; width: 30px; height: 30px; border-radius: 50%; font-size: 0.95rem; cursor: pointer;">
+            <button onclick="closeLearningModal()" style="background: rgba(255,255,255,0.15); border: none; color: #ffffff; width: 32px; height: 32px; border-radius: 50%; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s ease;">
                 ✕
             </button>
         </div>
 
-        <div style="background: #f7faf8; border: 1px solid #dce8de; border-radius: 14px; padding: 16px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #edf2ed;">
-                <span style="font-size: 0.8rem; color: #5a7061; font-weight: 600;">Academic Enrollment Fee</span>
-                <span style="font-size: 1.4rem; font-weight: 800; color: #1c4b32;"><?= htmlspecialchars($coursePrice) ?></span>
+        <!-- Modal Body: Lesson Selector Sidebar + Rich Study Workspace -->
+        <div style="display: flex; flex: 1; min-height: 0; overflow: hidden;">
+            
+            <!-- Left Sidebar: Lessons List -->
+            <div style="width: 290px; border-right: 1px solid #edf2ed; background: #f8faf8; padding: 18px; overflow-y: auto; flex-shrink: 0;">
+                <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #5a7061; margin-bottom: 12px;">
+                    Module Lessons
+                </div>
+                <div id="lm-lessons-container" style="display: flex; flex-direction: column; gap: 8px;">
+                    <!-- Injected dynamically by JS -->
+                </div>
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.78rem; color: #375943; font-weight: 600;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="color: #2d6a4f; font-weight: 800;">✓</span>
-                    <span>All 4 Curriculum Modules & Interactive Study Materials</span>
+            <!-- Right Workspace: Study Notes, Shell Terminal & Lab Sandbox -->
+            <div style="flex: 1; padding: 24px 28px; overflow-y: auto; background: #ffffff;">
+                
+                <!-- Lesson Title & Duration -->
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #edf2ed;">
+                    <div>
+                        <span id="lm-active-lesson-code" style="font-size: 0.75rem; font-weight: 800; color: #1c4b32; background: #eaf1eb; padding: 2px 8px; border-radius: 6px;">
+                            Lesson 1.1
+                        </span>
+                        <h2 id="lm-active-lesson-title" style="font-size: 1.25rem; font-weight: 700; color: #183324; margin: 8px 0 0 0; line-height: 1.25;">
+                            Introduction to Active & Passive Recon
+                        </h2>
+                    </div>
+                    <span id="lm-active-lesson-duration" style="font-size: 0.78rem; font-weight: 600; color: #5a7061; background: #f1f4f2; padding: 4px 10px; border-radius: 999px; flex-shrink: 0;">
+                        25 mins
+                    </span>
                 </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="color: #2d6a4f; font-weight: 800;">✓</span>
-                    <span>Full Access to Linux Virtual Terminals & Cloud Sandboxes</span>
+
+                <!-- Concept Overview Summary -->
+                <div style="margin-bottom: 20px;">
+                    <h4 style="font-size: 0.84rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #435b4b; margin: 0 0 8px 0;">
+                        Concept Summary
+                    </h4>
+                    <p id="lm-active-lesson-summary" style="font-size: 0.88rem; line-height: 1.6; color: #334a3b; margin: 0; background: #fbfdfb; border-left: 3px solid #1c4b32; padding: 12px 16px; border-radius: 0 10px 10px 0;">
+                        ...
+                    </p>
                 </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="color: #2d6a4f; font-weight: 800;">✓</span>
-                    <span>Verified Academic Certificate upon 100% Completion</span>
+
+                <!-- Key Learning Objectives -->
+                <div style="margin-bottom: 20px;">
+                    <h4 style="font-size: 0.84rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #435b4b; margin: 0 0 10px 0;">
+                        Key Learning Takeaways
+                    </h4>
+                    <ul id="lm-active-lesson-points" style="margin: 0; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 8px;">
+                        <!-- Injected dynamically by JS -->
+                    </ul>
                 </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="color: #2d6a4f; font-weight: 800;">✓</span>
-                    <span>Direct Project Grading by Prof. Robert Miller</span>
+
+                <!-- Interactive Terminal Box with Commands -->
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <h4 style="font-size: 0.84rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #435b4b; margin: 0;">
+                            Live Command Terminal Syntax
+                        </h4>
+                        <button type="button" onclick="copyLessonCommand()" id="lm-copy-btn" 
+                                style="background: #eaf1eb; border: 1px solid #d4e2d6; border-radius: 6px; padding: 3px 10px; font-size: 0.72rem; font-weight: 700; color: #1c4b32; cursor: pointer; font-family: inherit;">
+                            Copy Command
+                        </button>
+                    </div>
+                    <div style="background: #141e17; border-radius: 12px; padding: 14px 18px; border: 1px solid #233527; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 0.82rem; color: #a8d5b5; overflow-x: auto; box-shadow: inset 0 2px 6px rgba(0,0,0,0.4);">
+                        <div style="display: flex; gap: 6px; margin-bottom: 8px; opacity: 0.6;">
+                            <span style="width: 10px; height: 10px; border-radius: 50%; background: #ff5f56; display: inline-block;"></span>
+                            <span style="width: 10px; height: 10px; border-radius: 50%; background: #ffbd2e; display: inline-block;"></span>
+                            <span style="width: 10px; height: 10px; border-radius: 50%; background: #27c93f; display: inline-block;"></span>
+                            <span style="font-size: 0.68rem; color: #627467; margin-left: 6px;">bash — cyber-sandbox@kalavanta:~$</span>
+                        </div>
+                        <pre id="lm-active-lesson-commands" style="margin: 0; white-space: pre-wrap; word-break: break-all; line-height: 1.5; color: #cbe7d3;"></pre>
+                    </div>
                 </div>
+
+                <!-- Hands-on Lab Sandbox Instructions -->
+                <div style="background: #eef6f0; border: 1px solid #d2e6d6; border-radius: 14px; padding: 16px 20px; margin-bottom: 24px;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#1c4b32" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                        </svg>
+                        <h4 style="font-size: 0.86rem; font-weight: 700; color: #183324; margin: 0;">
+                            Hands-on Lab Exercise
+                        </h4>
+                    </div>
+                    <p id="lm-active-lesson-lab" style="font-size: 0.82rem; color: #2c4735; margin: 0; line-height: 1.5;">
+                        ...
+                    </p>
+                </div>
+
+                <!-- Actions: Launch Virtual Lab & Mark Complete -->
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 14px; padding-top: 14px; border-top: 1px solid #edf2ed;">
+                    <button type="button" onclick="launchVirtualLabDemo()" style="padding: 10px 20px; border-radius: 10px; background: #2d6a4f; color: #ffffff; border: none; font-weight: 700; font-size: 0.84rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-family: inherit; box-shadow: 0 2px 6px rgba(45,106,79,0.25);">
+                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Launch Virtual Cyber Sandbox</span>
+                    </button>
+
+                    <button type="button" id="lm-complete-toggle-btn" onclick="toggleLessonComplete()" style="padding: 10px 18px; border-radius: 10px; background: #eaf1eb; color: #1c4b32; border: 1px solid #d4e2d6; font-weight: 600; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-family: inherit;">
+                        <span>✓</span>
+                        <span id="lm-complete-text">Mark Lesson as Completed</span>
+                    </button>
+                </div>
+
             </div>
+
         </div>
-
-        <form action="/student/courses/buy" method="POST" style="margin: 0;">
-            <input type="hidden" name="code" value="<?= htmlspecialchars($activeSubject['code']) ?>">
-            <button type="submit" style="width: 100%; background: #1c4b32; color: #ffffff; border: none; padding: 13px; border-radius: 12px; font-size: 0.92rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 12px rgba(28, 75, 50, 0.25); display: flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; transition: background 0.15s;" onmouseover="this.style.background='#133724'" onmouseout="this.style.background='#1c4b32'">
-                <span>Confirm Enrollment & Instant Unlock &rarr;</span>
-            </button>
-        </form>
-
-        <p style="font-size: 0.72rem; color: #7a8d80; text-align: center; margin: 0;">
-            Billing applied to student ledger (Roll: <?= htmlspecialchars($student['roll_no'] ?? 'COMP-2026-001') ?>). Instant access granted upon confirmation.
-        </p>
 
     </div>
 
 </div>
 
-<!-- Client-side Course & Learning State -->
+<!-- ==================================================== -->
+<!-- INSTANT COURSE PURCHASE MODAL -->
+<!-- ==================================================== -->
+<div id="purchaseModal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(18, 38, 26, 0.65); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 20px;">
+    
+    <div style="background: #ffffff; border-radius: 24px; width: 100%; max-width: 520px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: modalFadeIn 0.2s ease-out;">
+        
+        <div style="background: #1c4b32; color: #ffffff; padding: 22px 24px; position: relative;">
+            <button onclick="closePurchaseModal()" style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.15); border: none; color: #ffffff; width: 30px; height: 30px; border-radius: 50%; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                ✕
+            </button>
+            <span id="pm-course-code" style="background: rgba(255,255,255,0.2); font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 6px;">
+                CS301
+            </span>
+            <h3 id="pm-course-name" style="font-size: 1.25rem; font-weight: 700; margin: 10px 0 4px 0; line-height: 1.25;">
+                Database Management Systems
+            </h3>
+            <p style="font-size: 0.82rem; color: #c4decb; margin: 0;">
+                Full-Semester Practical Curriculum & Certification Track
+            </p>
+        </div>
+
+        <form action="/student/courses/buy" method="POST" style="padding: 24px; margin: 0;">
+            <?= \App\Core\Csrf::field() ?>
+            <input type="hidden" name="code" id="pm-input-code" value="">
+
+            <div style="margin-bottom: 20px;">
+                <h4 style="font-size: 0.84rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #435b4b; margin: 0 0 10px 0;">
+                    Included with Enrollment:
+                </h4>
+                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.82rem; color: #2e4738;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="color: #2d6a4f; font-weight: 800;">✓</span>
+                        <span>Full access to all 4 modules and recorded mentor walkthroughs</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="color: #2d6a4f; font-weight: 800;">✓</span>
+                        <span>Interactive terminal environments & live sandbox exercises</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="color: #2d6a4f; font-weight: 800;">✓</span>
+                        <span>Final Capstone defense and verified Kalavanta Certificate</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: #f7faf8; border: 1px solid #d8e6db; border-radius: 14px; padding: 14px 18px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <span style="font-size: 0.74rem; font-weight: 600; color: #627467; display: block;">Enrollment Fee</span>
+                    <span id="pm-price" style="font-size: 1.45rem; font-weight: 800; color: #183324;">₹1,499</span>
+                </div>
+                <span style="font-size: 0.74rem; font-weight: 700; color: #2e7d32; background: #e8f5e9; padding: 4px 10px; border-radius: 999px;">
+                    Student Cohort Access
+                </span>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button type="button" onclick="closePurchaseModal()" style="flex: 1; padding: 11px; border-radius: 10px; background: #f1f4f2; color: #5a7061; border: none; font-weight: 600; font-size: 0.84rem; cursor: pointer; font-family: inherit;">
+                    Cancel
+                </button>
+                <button type="submit" style="flex: 2; padding: 11px; border-radius: 10px; background: #1c4b32; color: #ffffff; border: none; font-weight: 700; font-size: 0.86rem; cursor: pointer; font-family: inherit; box-shadow: 0 2px 8px rgba(28,75,50,0.25);">
+                    Confirm & Unlock Instantly &rarr;
+                </button>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+
+<!-- Data store for interactive Learning Modal -->
 <script>
-    var currentModules = <?= json_encode($modules, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
-    var activeCourseCode = <?= json_encode($selectedTrack) ?>;
-    var activeModIndex = 0;
-    var activeLessonIndex = 0;
-
-    // Filter track pills between Enrolled vs All Catalog
-    function filterTrackPills(filter) {
-        var btnEnrolled = document.getElementById('filter-btn-enrolled');
-        var btnAll = document.getElementById('filter-btn-all');
-        var catalogItems = document.querySelectorAll('.track-pill-item.is-catalog');
-
-        if (filter === 'enrolled') {
-            btnEnrolled.style.background = '#ffffff';
-            btnEnrolled.style.color = '#1c4b32';
-            btnEnrolled.style.fontWeight = '700';
-            btnEnrolled.style.boxShadow = '0 1px 2px rgba(0,0,0,0.06)';
-
-            btnAll.style.background = 'transparent';
-            btnAll.style.color = '#5a7061';
-            btnAll.style.fontWeight = '600';
-            btnAll.style.boxShadow = 'none';
-
-            catalogItems.forEach(function(el) {
-                el.style.display = 'none';
-            });
-        } else {
-            btnAll.style.background = '#ffffff';
-            btnAll.style.color = '#1c4b32';
-            btnAll.style.fontWeight = '700';
-            btnAll.style.boxShadow = '0 1px 2px rgba(0,0,0,0.06)';
-
-            btnEnrolled.style.background = 'transparent';
-            btnEnrolled.style.color = '#5a7061';
-            btnEnrolled.style.fontWeight = '600';
-            btnEnrolled.style.boxShadow = 'none';
-
-            catalogItems.forEach(function(el) {
-                el.style.display = 'inline-flex';
-            });
-        }
-    }
-
-    // Learning Modal Handlers
-    function openLearningModal(modIdx) {
-        activeModIndex = modIdx;
-        activeLessonIndex = 0;
-        var mod = currentModules[modIdx];
-        if (!mod) return;
-
-        document.getElementById('modal-track-badge').innerText = activeCourseCode;
-        document.getElementById('modal-module-title').innerText = mod.title;
-        document.getElementById('modal-module-progress').innerText = (mod.progress || 0) + '% Completed';
-
-        renderLessonIndex();
-        renderActiveLesson();
-
-        var modal = document.getElementById('learningModal');
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeLearningModal() {
-        var modal = document.getElementById('learningModal');
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-
-    function renderLessonIndex() {
-        var listContainer = document.getElementById('modal-lessons-list');
-        listContainer.innerHTML = '';
-        var mod = currentModules[activeModIndex];
-        if (!mod || !mod.lessons) return;
-
-        mod.lessons.forEach(function(lesson, idx) {
-            var isCur = (idx === activeLessonIndex);
-            var isDone = (lesson.status === 'completed');
-
-            var item = document.createElement('div');
-            item.onclick = function() {
-                activeLessonIndex = idx;
-                renderLessonIndex();
-                renderActiveLesson();
-            };
-            item.style.padding = '10px 12px';
-            item.style.borderRadius = '10px';
-            item.style.cursor = 'pointer';
-            item.style.transition = 'all 0.15s ease';
-            item.style.display = 'flex';
-            item.style.alignItems = 'center';
-            item.style.gap = '8px';
-            item.style.fontSize = '0.78rem';
-            item.style.fontWeight = isCur ? '700' : '600';
-            item.style.border = isCur ? '1px solid #2d6a4f' : '1px solid #e2ede5';
-            item.style.background = isCur ? '#ffffff' : '#f7faf8';
-            item.style.color = isCur ? '#143722' : '#3d5646';
-
-            var icon = isDone ? '✓' : (idx + 1);
-            var iconBg = isDone ? '#2d6a4f' : (isCur ? '#e2ede5' : '#eef3ef');
-            var iconColor = isDone ? '#ffffff' : '#1c4b32';
-
-            item.innerHTML = '<span style="width: 22px; height: 22px; border-radius: 50%; background: ' + iconBg + '; color: ' + iconColor + '; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; flex-shrink: 0;">' + icon + '</span>' +
-                             '<div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' +
-                                 '<span style="opacity: 0.75; font-size: 0.7rem;">' + (lesson.code || '') + '</span> ' +
-                                 (lesson.title || '') +
-                             '</div>';
-
-            listContainer.appendChild(item);
-        });
-    }
-
-    function renderActiveLesson() {
-        var mod = currentModules[activeModIndex];
-        if (!mod || !mod.lessons) return;
-        var lesson = mod.lessons[activeLessonIndex];
-        if (!lesson) return;
-
-        document.getElementById('active-lesson-code').innerText = 'LESSON ' + (lesson.code || (activeLessonIndex + 1));
-        document.getElementById('active-lesson-duration').innerText = lesson.duration || '25 mins';
-        document.getElementById('active-lesson-title').innerText = lesson.title || 'Technical Lesson';
-        document.getElementById('active-lesson-summary').innerText = lesson.summary || 'Study notes...';
-
-        var keyPointsEl = document.getElementById('active-lesson-keypoints');
-        keyPointsEl.innerHTML = '';
-        (lesson.key_points || []).forEach(function(kp) {
-            var li = document.createElement('li');
-            li.innerText = kp;
-            keyPointsEl.appendChild(li);
-        });
-
-        document.getElementById('active-lesson-commands').innerText = lesson.commands || '# No terminal commands needed for this theoretical overview.';
-        document.getElementById('active-lesson-lab').innerText = lesson.lab_instructions || 'Complete the quiz review in your student workbook.';
-
-        // Complete button status
-        var btnToggle = document.getElementById('btn-toggle-complete');
-        var btnText = document.getElementById('complete-btn-text');
-        var checkIcon = document.getElementById('complete-check-icon');
-
-        if (lesson.status === 'completed') {
-            btnToggle.style.background = '#e8f5e9';
-            btnToggle.style.color = '#1e4620';
-            btnToggle.style.borderColor = '#a8dab5';
-            btnText.innerText = 'Completed ✓';
-            checkIcon.innerText = '✓';
-        } else {
-            btnToggle.style.background = '#f0f6f1';
-            btnToggle.style.color = '#2d6a4f';
-            btnToggle.style.borderColor = '#cfe0d2';
-            btnText.innerText = 'Mark Lesson Completed';
-            checkIcon.innerText = '○';
-        }
-    }
-
-    function toggleLessonCompletion() {
-        var mod = currentModules[activeModIndex];
-        if (!mod || !mod.lessons) return;
-        var lesson = mod.lessons[activeLessonIndex];
-        if (!lesson) return;
-
-        if (lesson.status === 'completed') {
-            lesson.status = 'in_progress';
-        } else {
-            lesson.status = 'completed';
-        }
-
-        renderLessonIndex();
-        renderActiveLesson();
-    }
-
-    function nextLesson() {
-        var mod = currentModules[activeModIndex];
-        if (!mod || !mod.lessons) return;
-        if (activeLessonIndex < mod.lessons.length - 1) {
-            activeLessonIndex++;
-            renderLessonIndex();
-            renderActiveLesson();
-        } else {
-            alert('You have reached the end of Module ' + mod.number + '!');
-        }
-    }
-
-    function copyCommand() {
-        var text = document.getElementById('active-lesson-commands').innerText;
-        navigator.clipboard.writeText(text).then(function() {
-            var copyBtn = document.getElementById('copy-btn');
-            copyBtn.innerText = 'Copied!';
-            setTimeout(function() { copyBtn.innerText = 'Copy Syntax'; }, 2000);
-        });
-    }
-
-    // Purchase Modal Handlers
-    function openPurchaseModal() {
-        var modal = document.getElementById('purchaseModal');
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closePurchaseModal() {
-        var modal = document.getElementById('purchaseModal');
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-
-    // Keyboard & click outside listener
-    window.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeLearningModal();
-            closePurchaseModal();
-        }
-    });
+window.__CURRICULUM_DATA__ = <?= json_encode($allTracks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
 </script>
 
+<!-- Embedded Interactive Scripts for Filter Tabs, Drawers, Modals & Live Search -->
 <style>
-    @keyframes modalPop {
-        from { opacity: 0; transform: scale(0.96); }
-        to { opacity: 1; transform: scale(1); }
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(14px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.track-row-item:hover {
+    background: #fafcfb;
+}
+.action-pill-btn.btn-continue:hover {
+    background: #1c4b32 !important;
+    color: #ffffff !important;
+    border-color: #1c4b32 !important;
+    box-shadow: 0 3px 8px rgba(28, 75, 50, 0.18);
+}
+.action-pill-btn.btn-buy:hover {
+    background: #fde68a !important;
+    color: #78350f !important;
+    border-color: #f59e0b !important;
+}
+.module-card-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(28, 75, 50, 0.06) !important;
+}
+@media (max-width: 900px) {
+    .metrics-overview-grid {
+        grid-template-columns: 1fr !important;
     }
+    .track-row-item {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 14px !important;
+    }
+    .track-row-item > div:last-child {
+        width: 100% !important;
+        justify-content: space-between !important;
+    }
+    .track-progress-bar-wrap {
+        width: 140px !important;
+    }
+}
 </style>
+
+<script>
+// Filter Tabs Switching (All Tracks, In Progress, Completed)
+function switchCurriculumTab(tabType) {
+    document.querySelectorAll('.filter-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.fontWeight = '500';
+        btn.style.color = '#627467';
+        btn.style.borderBottomColor = 'transparent';
+    });
+
+    const activeBtn = document.getElementById('tab-' + tabType);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.style.fontWeight = '700';
+        activeBtn.style.color = '#183324';
+        activeBtn.style.borderBottomColor = '#1c4b32';
+    }
+
+    const rows = document.querySelectorAll('.track-row-wrapper');
+    rows.forEach(row => {
+        const status = row.getAttribute('data-status');
+        if (tabType === 'all') {
+            row.style.display = 'block';
+        } else if (tabType === 'in-progress') {
+            row.style.display = (status === 'in-progress') ? 'block' : 'none';
+        } else if (tabType === 'completed') {
+            row.style.display = (status === 'completed') ? 'block' : 'none';
+        }
+    });
+}
+
+// Toggle Track Modules Drawer
+function toggleTrackDrawer(trackCode) {
+    const drawer = document.getElementById('drawer-' + trackCode);
+    if (!drawer) return;
+    const isHidden = (drawer.style.display === 'none' || drawer.style.display === '');
+    drawer.style.display = isHidden ? 'block' : 'none';
+    if (isHidden) {
+        drawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+
+// Learning Modal Logic
+let currentModalTrack = null;
+let currentModalModule = null;
+let currentModalLessonIdx = 0;
+
+function openLearningModal(trackCode, moduleNumber) {
+    const track = window.__CURRICULUM_DATA__.find(t => t.code === trackCode);
+    if (!track) return;
+    const mod = (track.modules || []).find(m => m.number == moduleNumber) || track.modules[0];
+    if (!mod) return;
+
+    currentModalTrack = track;
+    currentModalModule = mod;
+    currentModalLessonIdx = 0;
+
+    document.getElementById('lm-track-code').textContent = track.code;
+    document.getElementById('lm-track-name').textContent = track.name;
+    document.getElementById('lm-modal-title').textContent = mod.title;
+
+    renderModalLessonsSidebar();
+    renderActiveLessonContent();
+
+    const modal = document.getElementById('learningModal');
+    modal.style.display = 'flex';
+}
+
+function closeLearningModal() {
+    document.getElementById('learningModal').style.display = 'none';
+}
+
+function renderModalLessonsSidebar() {
+    const container = document.getElementById('lm-lessons-container');
+    container.innerHTML = '';
+    const lessons = currentModalModule.lessons || [];
+
+    lessons.forEach((l, idx) => {
+        const isCurrent = (idx === currentModalLessonIdx);
+        const item = document.createElement('div');
+        item.style.padding = '9px 12px';
+        item.style.borderRadius = '10px';
+        item.style.cursor = 'pointer';
+        item.style.transition = 'all 0.15s ease';
+        item.style.background = isCurrent ? '#1c4b32' : '#ffffff';
+        item.style.color = isCurrent ? '#ffffff' : '#183324';
+        item.style.border = isCurrent ? '1px solid #1c4b32' : '1px solid #e5ece6';
+        item.style.boxShadow = isCurrent ? '0 2px 6px rgba(28,75,50,0.2)' : 'none';
+
+        item.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <span style="font-size: 0.7rem; font-weight: 800; ${isCurrent ? 'color: #a8d5b5;' : 'color: #5a7061;'}">${l.code}</span>
+                <span style="font-size: 0.68rem; ${isCurrent ? 'color: #c4decb;' : 'color: #7a8d80;'}">${l.duration}</span>
+            </div>
+            <div style="font-size: 0.8rem; font-weight: 600; margin-top: 3px; line-height: 1.25; ${isCurrent ? 'color: #ffffff;' : 'color: #183324;'}">
+                ${l.title}
+            </div>
+        `;
+        item.onclick = () => {
+            currentModalLessonIdx = idx;
+            renderModalLessonsSidebar();
+            renderActiveLessonContent();
+        };
+        container.appendChild(item);
+    });
+}
+
+function renderActiveLessonContent() {
+    const lessons = currentModalModule.lessons || [];
+    const lesson = lessons[currentModalLessonIdx];
+    if (!lesson) return;
+
+    document.getElementById('lm-active-lesson-code').textContent = 'Lesson ' + lesson.code;
+    document.getElementById('lm-active-lesson-title').textContent = lesson.title;
+    document.getElementById('lm-active-lesson-duration').textContent = lesson.duration;
+    document.getElementById('lm-active-lesson-summary').textContent = lesson.summary;
+
+    const pointsList = document.getElementById('lm-active-lesson-points');
+    pointsList.innerHTML = '';
+    (lesson.key_points || []).forEach(pt => {
+        const li = document.createElement('li');
+        li.style.display = 'flex';
+        li.style.alignItems = 'flex-start';
+        li.style.gap = '8px';
+        li.style.fontSize = '0.84rem';
+        li.style.color = '#2d4435';
+        li.innerHTML = `<span style="color: #2d6a4f; font-weight: 800; line-height: 1.4;">•</span><span>${pt}</span>`;
+        pointsList.appendChild(li);
+    });
+
+    document.getElementById('lm-active-lesson-commands').textContent = lesson.commands || 'No command execution required for this conceptual lesson.';
+    document.getElementById('lm-active-lesson-lab').textContent = lesson.lab_instructions || 'Complete the lesson review questions and submit the assessment.';
+
+    const isComplete = (lesson.status === 'completed');
+    const completeBtn = document.getElementById('lm-complete-toggle-btn');
+    const completeText = document.getElementById('lm-complete-text');
+    if (isComplete) {
+        completeBtn.style.background = '#e8f5e9';
+        completeBtn.style.color = '#2e7d32';
+        completeBtn.style.borderColor = '#c8e6c9';
+        completeText.textContent = 'Completed ✓';
+    } else {
+        completeBtn.style.background = '#eaf1eb';
+        completeBtn.style.color = '#1c4b32';
+        completeBtn.style.borderColor = '#d4e2d6';
+        completeText.textContent = 'Mark Lesson as Completed';
+    }
+}
+
+function copyLessonCommand() {
+    const cmdText = document.getElementById('lm-active-lesson-commands').textContent;
+    navigator.clipboard.writeText(cmdText).then(() => {
+        const btn = document.getElementById('lm-copy-btn');
+        const orig = btn.textContent;
+        btn.textContent = '✓ Copied!';
+        btn.style.background = '#2d6a4f';
+        btn.style.color = '#ffffff';
+        setTimeout(() => {
+            btn.textContent = orig;
+            btn.style.background = '#eaf1eb';
+            btn.style.color = '#1c4b32';
+        }, 1800);
+    });
+}
+
+function toggleLessonComplete() {
+    const lessons = currentModalModule.lessons || [];
+    const lesson = lessons[currentModalLessonIdx];
+    if (!lesson) return;
+    lesson.status = (lesson.status === 'completed') ? 'in_progress' : 'completed';
+    renderActiveLessonContent();
+}
+
+function launchVirtualLabDemo() {
+    alert('Launching sandbox instance for ' + currentModalTrack.name + ' (' + currentModalTrack.code + ')...\nVirtual Terminal Container active on port 4200.');
+}
+
+// Course Purchase Modal Logic
+function openPurchaseModal(code, name, price) {
+    document.getElementById('pm-input-code').value = code;
+    document.getElementById('pm-course-code').textContent = code;
+    document.getElementById('pm-course-name').textContent = name;
+    document.getElementById('pm-price').textContent = price;
+    document.getElementById('purchaseModal').style.display = 'flex';
+}
+
+function closePurchaseModal() {
+    document.getElementById('purchaseModal').style.display = 'none';
+}
+
+// Live Search Integration with Topbar Search Pill
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('.search-pill-box input');
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', function(e) {
+        const query = e.target.value.toLowerCase().trim();
+        const rows = document.querySelectorAll('.track-row-wrapper');
+
+        rows.forEach(row => {
+            if (!query) {
+                row.style.display = 'block';
+                return;
+            }
+            const code = (row.getAttribute('data-track-code') || '').toLowerCase();
+            const title = (row.querySelector('.track-title-text')?.textContent || '').toLowerCase();
+            const subtitle = (row.querySelector('.track-subtitle-text')?.textContent || '').toLowerCase();
+            const drawerContent = (row.querySelector('.track-modules-drawer')?.textContent || '').toLowerCase();
+
+            if (code.includes(query) || title.includes(query) || subtitle.includes(query) || drawerContent.includes(query)) {
+                row.style.display = 'block';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+});
+</script>

@@ -31,6 +31,21 @@ class CourseController
                 ORDER BY s.code ASC
             ");
             $subjects = $stmt->fetchAll();
+
+            // Order tracks matching the official curriculum sequence: CYB tracks first, then CS tracks
+            $priority = [
+                'CYB301' => 1,
+                'CYB302' => 2,
+                'CYB303' => 3,
+                'CYB304' => 4,
+                'CS301' => 5,
+                'CS302' => 6,
+                'CS303' => 7,
+                'CS304' => 8,
+            ];
+            usort($subjects, function ($a, $b) use ($priority) {
+                return ($priority[$a['code']] ?? 99) <=> ($priority[$b['code']] ?? 99);
+            });
         }
 
         // Initialize or retrieve student enrolled/purchased courses
@@ -78,47 +93,122 @@ class CourseController
         $isEnrolled = in_array($activeCode, $enrolledCourses, true);
         $courseName = $activeSubject['name'] ?? 'Ethical Hacking & Pen Testing';
 
-        // Catalog course pricing
-        $coursePrices = [
-            'CS301' => '₹1,499',
-            'CS302' => '₹1,299',
-            'CS303' => '₹1,199',
-            'CS304' => '₹1,499',
-            'CYB301' => '₹2,499',
-            'CYB302' => '₹2,499',
-            'CYB303' => '₹1,999',
-            'CYB304' => '₹1,999',
+        // Track metadata matching Kalavanta curriculum UI specifications
+        $tracksMeta = [
+            'CYB301' => [
+                'name' => 'Network Defense Essentials',
+                'subtitle' => 'Strengthen your network security skills',
+                'progress' => 67,
+                'status' => 'in_progress',
+                'icon' => 'shield',
+                'price' => 'Included',
+            ],
+            'CYB302' => [
+                'name' => 'Ethical Hacking & Pen Testing',
+                'subtitle' => 'Learn penetration testing techniques',
+                'progress' => 50,
+                'status' => 'in_progress',
+                'icon' => 'hacker',
+                'price' => 'Included',
+            ],
+            'CYB303' => [
+                'name' => 'Cryptographic & Data Security',
+                'subtitle' => 'Master encryption and data protection',
+                'progress' => 75,
+                'status' => 'in_progress',
+                'icon' => 'key',
+                'price' => 'Included',
+            ],
+            'CYB304' => [
+                'name' => 'Incident Response & Forensics',
+                'subtitle' => 'Build skills in incident handling and forensics',
+                'progress' => 33,
+                'status' => 'in_progress',
+                'icon' => 'forensics',
+                'price' => 'Included',
+            ],
+            'CS301' => [
+                'name' => 'Database Management Systems',
+                'subtitle' => 'Relational algebra, SQL optimization and indexing',
+                'progress' => 100,
+                'status' => 'completed',
+                'icon' => 'database',
+                'price' => '₹1,499',
+            ],
+            'CS302' => [
+                'name' => 'Computer Networks',
+                'subtitle' => 'TCP/IP, routing protocols, and packet switching',
+                'progress' => 80,
+                'status' => 'in_progress',
+                'icon' => 'network',
+                'price' => '₹1,299',
+            ],
+            'CS303' => [
+                'name' => 'Theory of Computation',
+                'subtitle' => 'Automata, formal languages, and Turing machines',
+                'progress' => 45,
+                'status' => 'in_progress',
+                'icon' => 'theory',
+                'price' => '₹1,199',
+            ],
+            'CS304' => [
+                'name' => 'Web Computing & ERP',
+                'subtitle' => 'Enterprise workflows, REST architecture and web security',
+                'progress' => 90,
+                'status' => 'in_progress',
+                'icon' => 'web',
+                'price' => '₹1,499',
+            ],
         ];
 
         // Comprehensive track modules with study lessons & technical materials
         $trackModules = $this->getAllTrackModules();
-        $modules = $trackModules[$activeCode] ?? $trackModules['CYB302'];
 
-        // Split subjects into Enrolled vs Available Catalog
-        $myEnrolledSubjects = [];
-        $catalogSubjects = [];
+        // Build composite tracks array
+        $allTracks = [];
         foreach ($subjects as $s) {
-            if (in_array($s['code'], $enrolledCourses, true)) {
-                $myEnrolledSubjects[] = $s;
-            } else {
-                $catalogSubjects[] = $s;
-            }
+            $c = $s['code'];
+            $meta = $tracksMeta[$c] ?? [
+                'name' => $s['name'],
+                'subtitle' => 'Core technical track syllabus',
+                'progress' => 50,
+                'status' => 'in_progress',
+                'icon' => 'shield',
+                'price' => '₹1,499',
+            ];
+            $isCurEnrolled = in_array($c, $enrolledCourses, true);
+            $allTracks[] = [
+                'code' => $c,
+                'name' => $meta['name'],
+                'subtitle' => $meta['subtitle'],
+                'progress' => $isCurEnrolled ? $meta['progress'] : 0,
+                'display_progress' => $meta['progress'],
+                'status' => $meta['status'],
+                'icon' => $meta['icon'],
+                'price' => $meta['price'],
+                'is_enrolled' => $isCurEnrolled,
+                'department_name' => $s['department_name'] ?? 'Computer Engineering',
+                'credits' => $s['credits'] ?? 3,
+                'instructor_name' => $s['instructor_name'] ?? 'Prof. Robert Miller',
+                'modules' => $trackModules[$c] ?? $trackModules['CYB302'],
+            ];
         }
 
         View::render('student.curriculum', [
-            'title' => 'Curriculum: ' . $courseName,
-            'headerTitle' => 'Curriculum: ' . $courseName,
-            'searchPlaceholder' => 'Search your modules...',
+            'title' => 'Curriculum',
+            'headerTitle' => 'Curriculum',
+            'headerSubtitle' => 'Explore your learning path and track your progress',
+            'backUrl' => '/student/dashboard',
+            'searchPlaceholder' => 'Search modules...',
             'student' => $student,
             'subjects' => $subjects,
-            'myEnrolledSubjects' => $myEnrolledSubjects,
-            'catalogSubjects' => $catalogSubjects,
+            'allTracks' => $allTracks,
             'enrolledCourses' => $enrolledCourses,
-            'isEnrolled' => $isEnrolled,
-            'activeSubject' => $activeSubject,
             'selectedTrack' => $activeCode,
-            'coursePrice' => $coursePrices[$activeCode] ?? '₹1,499',
-            'modules' => $modules,
+            'overallProgress' => 67,
+            'enrolledTracksCount' => count($subjects),
+            'completedLabsCount' => 46,
+            'pendingLabsCount' => 12,
         ], 'student');
     }
 

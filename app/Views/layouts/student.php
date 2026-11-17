@@ -564,9 +564,21 @@
             <header class="canvas-topbar">
                 <div class="canvas-title-group">
                     <?php if (!empty($headerTitle)): ?>
-                        <h1 class="font-serif">
-                            <?= htmlspecialchars($headerTitle) ?>
-                        </h1>
+                        <div style="display: flex; align-items: flex-start; gap: 10px;">
+                            <?php if (!empty($backUrl)): ?>
+                                <a href="<?= htmlspecialchars($backUrl) ?>" style="color: #183324; text-decoration: none; font-size: 1.25rem; font-weight: 700; line-height: 1.2; margin-top: 2px;" title="Back">&larr;</a>
+                            <?php endif; ?>
+                            <div>
+                                <h1 class="font-serif" style="margin: 0; line-height: 1.2;">
+                                    <?= htmlspecialchars($headerTitle) ?>
+                                </h1>
+                                <?php if (!empty($headerSubtitle)): ?>
+                                    <p style="font-size: 0.8rem; color: #627467; margin: 3px 0 0 0; font-weight: 500;">
+                                        <?= htmlspecialchars($headerSubtitle) ?>
+                                    </p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
                     <?php else: ?>
                         <h1 class="font-serif">
                             Welcome back, <?= htmlspecialchars(explode(' ', (string)\App\Core\Session::get('user_name', 'Shantanu'))[0]) ?>!
