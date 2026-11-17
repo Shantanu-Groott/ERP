@@ -55,6 +55,10 @@ $router->get('/student/courses', [StudentCourse::class, 'index'], [
     AuthMiddleware::class
 ]);
 
+$router->post('/student/courses/buy', [StudentCourse::class, 'buy'], [
+    AuthMiddleware::class
+]);
+
 $router->get('/student/notices', [StudentNotice::class, 'index'], [
     AuthMiddleware::class
 ]);
