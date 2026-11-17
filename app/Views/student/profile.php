@@ -154,7 +154,7 @@ $avatarLetter = strtoupper(substr((string)$fullName, 0, 1));
         </div>
 
         <!-- Student Bio Statement & External Portfolios -->
-        <div style="margin-top: 22px; padding-top: 18px; border-top: 1px solid #edf2ed; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <div style="margin-top: 22px; padding-top: 18px; border-top: 1px solid #edf2ed; display: flex; justify-content: space-between; align-items: left; flex-direction: column; gap: 14px;">
             <div style="flex: 1; min-width: 260px;">
                 <span style="font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #718576; display: block; margin-bottom: 4px;">
                     Personal Statement
@@ -264,19 +264,47 @@ $avatarLetter = strtoupper(substr((string)$fullName, 0, 1));
                 <h3 style="font-size: 1.05rem; font-weight: 700; color: #183324; margin: 0 0 3px 0;">
                     Learning & Practical Lab Activity
                 </h3>
-                <p style="font-size: 0.8rem; color: #627467; margin: 0;">
+                <p id="calendar-activity-summary" style="font-size: 0.8rem; color: #627467; margin: 0;">
                     <?= htmlspecialchars($stats['total_contributions']) ?> contributions & sandbox sessions across the past 52 weeks
                 </p>
             </div>
 
-            <!-- Streak summary pills -->
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 0.76rem; font-weight: 700; color: #1c4b32; background: #eaf1eb; border: 1px solid #d4e2d6; padding: 4px 12px; border-radius: 999px;">
-                    🔥 Current Streak: <?= htmlspecialchars($stats['current_streak']) ?> Days
-                </span>
-                <span style="font-size: 0.76rem; font-weight: 600; color: #4b6352; background: #f8faf8; border: 1px solid #e2ece4; padding: 4px 12px; border-radius: 999px;">
-                    🏆 Longest Streak: <?= htmlspecialchars($stats['longest_streak']) ?> Days
-                </span>
+            <!-- Month & Year Filter Dropdowns -->
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                
+                <!-- Month Filter Dropdown -->
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <label for="filter-month" style="font-size: 0.76rem; font-weight: 700; color: #526757;">Month:</label>
+                    <select id="filter-month" onchange="filterActivityCalendar()" 
+                            style="background: #ffffff; border: 1px solid #d4e2d6; border-radius: 999px; padding: 5px 14px; font-size: 0.78rem; font-weight: 600; color: #183324; cursor: pointer; font-family: inherit; outline: none; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                        <option value="all">All Months</option>
+                        <option value="01">January</option>
+                        <option value="02">February</option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                </div>
+
+                <!-- Year Filter Dropdown -->
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <label for="filter-year" style="font-size: 0.76rem; font-weight: 700; color: #526757;">Year:</label>
+                    <select id="filter-year" onchange="filterActivityCalendar()" 
+                            style="background: #ffffff; border: 1px solid #d4e2d6; border-radius: 999px; padding: 5px 14px; font-size: 0.78rem; font-weight: 600; color: #183324; cursor: pointer; font-family: inherit; outline: none; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                        <option value="all">All Years</option>
+                        <option value="2026" selected>2026</option>
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                    </select>
+                </div>
+
             </div>
         </div>
 
@@ -329,8 +357,10 @@ $avatarLetter = strtoupper(substr((string)$fullName, 0, 1));
                                         : "No activity on {$day['display_date']}";
                                 ?>
                                     <div class="calendar-cell"
+                                         data-date="<?= htmlspecialchars($day['date']) ?>"
+                                         data-count="<?= (int)$day['count'] ?>"
                                          data-tooltip="<?= htmlspecialchars($tooltipText) ?>"
-                                         style="width: 11px; height: 11px; border-radius: 2.5px; background: <?= $c ?>; cursor: pointer; transition: transform 0.1s ease;">
+                                         style="width: 11px; height: 11px; border-radius: 2.5px; background: <?= $c ?>; cursor: pointer; transition: transform 0.1s ease, opacity 0.25s ease;">
                                     </div>
                                 <?php endforeach; ?>
                             </div>
@@ -582,5 +612,56 @@ function openEditProfileModal() {
 function closeEditProfileModal() {
     const modal = document.getElementById('editProfileModal');
     if (modal) modal.style.display = 'none';
+}
+
+function filterActivityCalendar() {
+    const monthSelect = document.getElementById('filter-month');
+    const yearSelect = document.getElementById('filter-year');
+    if (!monthSelect || !yearSelect) return;
+
+    const selMonth = monthSelect.value;
+    const selYear = yearSelect.value;
+
+    const cells = document.querySelectorAll('.calendar-cell');
+    let matchingContributions = 0;
+
+    cells.forEach(cell => {
+        const dateStr = cell.getAttribute('data-date') || '';
+        const count = parseInt(cell.getAttribute('data-count') || '0', 10);
+        const parts = dateStr.split('-');
+        const y = parts[0];
+        const m = parts[1];
+
+        const matchesYear = (selYear === 'all' || y === selYear);
+        const matchesMonth = (selMonth === 'all' || m === selMonth);
+
+        if (matchesYear && matchesMonth) {
+            cell.style.opacity = '1';
+            cell.style.filter = 'none';
+            matchingContributions += count;
+        } else {
+            cell.style.opacity = '0.15';
+            cell.style.filter = 'grayscale(100%)';
+        }
+    });
+
+    const summaryText = document.getElementById('calendar-activity-summary');
+    if (summaryText) {
+        const monthNames = {
+            '01': 'January', '02': 'February', '03': 'March', '04': 'April',
+            '05': 'May', '06': 'June', '07': 'July', '08': 'August',
+            '09': 'September', '10': 'October', '11': 'November', '12': 'December'
+        };
+
+        if (selMonth === 'all' && selYear === 'all') {
+            summaryText.textContent = matchingContributions + ' contributions & sandbox sessions across all recorded activity';
+        } else if (selMonth === 'all') {
+            summaryText.textContent = matchingContributions + ' contributions & sandbox sessions in ' + selYear;
+        } else if (selYear === 'all') {
+            summaryText.textContent = matchingContributions + ' contributions recorded in ' + (monthNames[selMonth] || selMonth);
+        } else {
+            summaryText.textContent = matchingContributions + ' contributions recorded in ' + (monthNames[selMonth] || selMonth) + ' ' + selYear;
+        }
+    }
 }
 </script>
