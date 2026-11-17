@@ -24,6 +24,7 @@ class DashboardController
         $fees = [];
         $subjects = [];
         $activeLiveClass = null;
+        $notices = [];
 
         $db = Database::getConnection();
 
@@ -33,6 +34,21 @@ class DashboardController
             $activeLiveClass = $stmtLive->fetch();
         } catch (\Throwable $e) {
             $activeLiveClass = null;
+        }
+
+        // Fetch latest institutional announcements & bulletins
+        try {
+            $stmtNotices = $db->query("
+                SELECT a.*, u.full_name as author_name
+                FROM announcements a
+                LEFT JOIN users u ON a.author_id = u.id
+                WHERE a.audience IN ('all', 'students')
+                ORDER BY a.created_at DESC
+                LIMIT 4
+            ");
+            $notices = $stmtNotices->fetchAll();
+        } catch (\Throwable $e) {
+            $notices = [];
         }
 
         if ($student) {
@@ -57,6 +73,7 @@ class DashboardController
             'fees' => $fees,
             'subjects' => $subjects,
             'activeLiveClass' => $activeLiveClass,
+            'notices' => $notices,
         ], 'student');
     }
 }
