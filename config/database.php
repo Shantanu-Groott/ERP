@@ -5,11 +5,24 @@
 // Supports dual-mode: 'remote' (Deployment) & 'local' (Tests)
 // ====================================================
 
-// Determine target: check DB_TARGET in .env, then APP_ENV
-// Defaults to 'local' for local development or 'remote' in production
+// Auto-detect deployment vs local development:
+$httpHost = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? '');
+$isLocalDev = (
+    empty($httpHost) ||
+    str_contains($httpHost, 'localhost') ||
+    str_starts_with($httpHost, '127.0.0.1') ||
+    str_starts_with($httpHost, '::1') ||
+    (php_sapi_name() === 'cli' && getenv('DB_TARGET') === 'local')
+);
+
+// Determine target: check DB_TARGET in .env, then production/live host detection
 $target = getenv('DB_TARGET');
 if (!$target) {
-    $target = (getenv('APP_ENV') === 'production') ? 'remote' : 'local';
+    if (getenv('APP_ENV') === 'production' || (!$isLocalDev && !empty($httpHost))) {
+        $target = 'remote';
+    } else {
+        $target = 'local';
+    }
 }
 $target = strtolower(trim((string)$target));
 

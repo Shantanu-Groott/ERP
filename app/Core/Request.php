@@ -31,7 +31,23 @@ class Request
         if ($position !== false) {
             $uri = substr($uri, 0, $position);
         }
-        return rtrim($uri, '/') ?: '/';
+
+        // Auto-detect and strip base directory if deployed in a subdirectory (e.g. /erp or /portal)
+        $scriptName = $this->server['SCRIPT_NAME'] ?? '';
+        $baseDir = str_replace('\\', '/', dirname($scriptName));
+        if ($baseDir !== '/' && $baseDir !== '.' && $baseDir !== '') {
+            if (str_starts_with($uri, $baseDir)) {
+                $uri = substr($uri, strlen($baseDir));
+            } elseif (str_ends_with($baseDir, '/public')) {
+                $parent = dirname($baseDir);
+                if ($parent !== '/' && $parent !== '.' && str_starts_with($uri, $parent)) {
+                    $uri = substr($uri, strlen($parent));
+                }
+            }
+        }
+
+        $clean = '/' . ltrim(rtrim($uri, '/'), '/');
+        return $clean === '' ? '/' : $clean;
     }
 
     public function all(): array

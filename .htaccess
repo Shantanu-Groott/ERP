@@ -1,0 +1,51 @@
+# ====================================================
+# Kalavanta Edutech Student ERP - Root Web Server Configuration
+# Compatible with Apache 2.4+, LiteSpeed, cPanel, Hostinger
+# ====================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 1. SECURITY: Block direct web access to sensitive directories and config files
+    RewriteRule ^\.env - [F,L,NC]
+    RewriteRule ^\.git - [F,L,NC]
+    RewriteRule ^(app|bootstrap|config|database|routes|storage|tests|vendor|scratch)/ - [F,L,NC]
+    RewriteRule ^composer\.(json|lock) - [F,L,NC]
+    RewriteRule ^package(-lock)?\.json - [F,L,NC]
+
+    # 2. STATIC ASSETS: If request is for /assets/... or /public/assets/...
+    RewriteCond %{DOCUMENT_ROOT}/public/assets/$1 -f [OR]
+    RewriteCond %{DOCUMENT_ROOT}/public/assets/$1 -d
+    RewriteRule ^assets/(.*)$ public/assets/$1 [L,NC]
+
+    RewriteCond %{DOCUMENT_ROOT}/public/$1 -f
+    RewriteRule ^public/(.*)$ public/$1 [L,NC]
+
+    # 3. If file or folder exists in root, serve directly
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # 4. If file exists in public/ (e.g. favicon.ico, robots.txt), serve from public/
+    RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -f
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    # 5. FRONT CONTROLLER: Route all virtual URLs (/login, /student/*) to index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+# Fallback for servers without mod_rewrite
+<IfModule mod_dir.c>
+    DirectoryIndex index.php public/index.php index.html
+    FallbackResource /index.php
+</IfModule>
+
+# Disable Directory Browsing
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
+
+# Default Charset
+AddDefaultCharset UTF-8

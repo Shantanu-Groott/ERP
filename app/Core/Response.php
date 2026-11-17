@@ -29,6 +29,20 @@ class Response
     public function redirect(string $url, int $statusCode = 302): void
     {
         $this->setStatusCode($statusCode);
+
+        if (str_starts_with($url, '/')) {
+            $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+            $baseDir = str_replace('\\', '/', dirname($scriptName));
+            if ($baseDir !== '/' && $baseDir !== '.' && $baseDir !== '') {
+                if (str_ends_with($baseDir, '/public')) {
+                    $baseDir = dirname($baseDir);
+                }
+                if ($baseDir !== '/' && $baseDir !== '.' && !str_starts_with($url, $baseDir)) {
+                    $url = rtrim($baseDir, '/') . $url;
+                }
+            }
+        }
+
         header("Location: {$url}");
         exit;
     }

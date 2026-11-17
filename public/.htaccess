@@ -1,6 +1,30 @@
+# ====================================================
+# Kalavanta Edutech Student ERP - Public Directory Configuration
+# Used when web server DocumentRoot points directly to public/
+# ====================================================
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^ index.php [L,QSA]
+
+    # 1. Block access to hidden files (.env, .git, etc.)
+    RewriteRule ^\. - [F,L,NC]
+
+    # 2. If physical file or directory exists, serve directly
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # 3. Route all virtual URLs to index.php
+    RewriteRule ^ index.php [QSA,L]
 </IfModule>
+
+<IfModule mod_dir.c>
+    DirectoryIndex index.php
+    FallbackResource /index.php
+</IfModule>
+
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
+
+AddDefaultCharset UTF-8

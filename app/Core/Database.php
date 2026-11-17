@@ -35,7 +35,17 @@ class Database
 
         if (self::$instance === null) {
             $config = require dirname(dirname(__DIR__)) . '/config/database.php';
-            self::$instance = self::createPdoInstance($config, $config['options'] ?? []);
+            try {
+                self::$instance = self::createPdoInstance($config, $config['options'] ?? []);
+            } catch (\Throwable $e) {
+                // If local connection failed and remote configuration is available, try remote fallback
+                if (($config['target'] ?? '') === 'local' && isset($config['connections']['remote'])) {
+                    error_log("Local DB connection failed, attempting remote fallback: " . $e->getMessage());
+                    self::$instance = self::createPdoInstance($config['connections']['remote'], $config['options'] ?? []);
+                } else {
+                    throw $e;
+                }
+            }
         }
 
         return self::$instance;

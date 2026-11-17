@@ -35,7 +35,7 @@ if ($uri !== '/' && file_exists($targetFile) && !is_dir($targetFile)) {
         header('Content-Type: ' . $mimes[$ext]);
     }
     readfile($targetFile);
-    return true;
+    exit;
 }
 
 // Forward to front controller in public/index.php
