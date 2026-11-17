@@ -11,7 +11,7 @@
         :root {
             --bg-sage: #e8efe9;
             --bg-surface: #f4f7f4;
-            --sidebar-bg: #ffffffff;
+            --sidebar-bg: #eef3ee;
             --card-bg: #ffffff;
             --card-muted: #f7faf7;
             --text-dark: #1e2d24;
@@ -430,6 +430,20 @@
         <!-- Left Sage Minimal Sidebar (Full Height & Scroll-Locked) -->
         <aside class="portal-sidebar">
             <div class="sidebar-inner-top">
+                <!-- Brand Header Matching Mockup -->
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 22px; padding: 2px 2px;">
+                    <a href="/student/dashboard" style="display: flex; align-items: center; gap: 9px; text-decoration: none;">
+                        <img src="/assets/img/logo.png" alt="Kalavanta" style="height: 28px; width: auto; object-fit: contain;">
+                        <div style="display: flex; flex-direction: column; line-height: 1.1;">
+                            <span style="font-size: 0.92rem; font-weight: 800; color: #163622; letter-spacing: -0.2px;">Kalavanta</span>
+                            <span style="font-size: 0.8rem; font-weight: 700; color: #2e5a3c;">Edutech</span>
+                        </div>
+                    </a>
+                    <span style="background: #d8e8dc; color: #205034; font-size: 0.72rem; font-weight: 700; padding: 3px 9px; border-radius: 9999px;">
+                        Student
+                    </span>
+                </div>
+
                 <!-- User Profile Pill -->
                 <div class="user-profile-header">
                     <div class="avatar-circle">
@@ -469,7 +483,7 @@
                                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                                 </svg>
-                                <span>My Curriculum</span>
+                                <span>Curriculum</span>
                             </a>
                         </li>
                         <li class="sidebar-nav-item <?= strpos($currentUri, '/student/attendance') !== false ? 'active' : '' ?>">
@@ -533,12 +547,20 @@
             </div>
 
             <!-- Bottom Settings / Logout -->
-            <div class="sidebar-bottom">
-                <a href="/logout" title="Sign out" style="color: #843030; font-size: 0.82rem;">
-                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            <div class="sidebar-bottom" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 14px; border-top: 1px solid #dbe5db;">
+                <a href="#settings" onclick="alert('Student settings & preferences'); return false;" style="display: inline-flex; align-items: center; gap: 8px; color: #3b5343; text-decoration: none; font-size: 0.84rem; font-weight: 600;">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <span>Sign Out</span>
+                    <span>Settings</span>
+                </a>
+
+                <a href="/logout" title="Sign out" style="display: inline-flex; align-items: center; gap: 5px; color: #843030; text-decoration: none; font-size: 0.76rem; font-weight: 600; padding: 4px 8px; border-radius: 6px; background: rgba(132, 48, 48, 0.08);">
+                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>Exit</span>
                 </a>
             </div>
         </aside>
@@ -549,10 +571,16 @@
             <!-- Topbar with Serife Title & Search Pill -->
             <header class="canvas-topbar">
                 <div class="canvas-title-group">
-                    <h1 class="font-serif">
-                        Welcome back, <?= htmlspecialchars(explode(' ', (string)\App\Core\Session::get('user_name', 'Shantanu'))[0]) ?>!
-                        <span style="font-size: 1.8rem;">👋</span>
-                    </h1>
+                    <?php if (!empty($headerTitle)): ?>
+                        <h1 class="font-serif">
+                            <?= htmlspecialchars($headerTitle) ?>
+                        </h1>
+                    <?php else: ?>
+                        <h1 class="font-serif">
+                            Welcome back, <?= htmlspecialchars(explode(' ', (string)\App\Core\Session::get('user_name', 'Shantanu'))[0]) ?>!
+                            <span style="font-size: 1.8rem;">👋</span>
+                        </h1>
+                    <?php endif; ?>
                 </div>
 
                 <div class="search-pill-container">
@@ -560,7 +588,7 @@
                         <svg width="16" height="16" fill="none" stroke="#718576" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
-                        <input type="text" placeholder="Search courses, labs, modules...">
+                        <input type="text" placeholder="<?= !empty($searchPlaceholder) ? htmlspecialchars($searchPlaceholder) : 'Search courses, labs, modules...' ?>">
                     </div>
                     
                     <a href="/student/notices" class="icon-notification-btn" title="Notices">
