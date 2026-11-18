@@ -48,6 +48,10 @@ $router->get('/student/results', [StudentResult::class, 'index'], [
     AuthMiddleware::class
 ]);
 
+$router->get('/student/exams', [StudentResult::class, 'index'], [
+    AuthMiddleware::class
+]);
+
 $router->get('/student/curriculum', [StudentCourse::class, 'index'], [
     AuthMiddleware::class
 ]);

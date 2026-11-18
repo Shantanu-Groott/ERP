@@ -567,9 +567,14 @@
             <header class="canvas-topbar">
                 <div class="canvas-title-group">
                     <?php if (!empty($headerTitle)): ?>
-                        <div style="display: flex; align-items: flex-start; gap: 10px;">
+                        <div style="display: flex; align-items: flex-start; gap: 12px;">
                             <?php if (!empty($backUrl)): ?>
                                 <a href="<?= htmlspecialchars($backUrl) ?>" style="color: #183324; text-decoration: none; font-size: 1.25rem; font-weight: 700; line-height: 1.2; margin-top: 2px;" title="Back">&larr;</a>
+                            <?php endif; ?>
+                            <?php if (!empty($headerIcon)): ?>
+                                <div style="margin-top: 3px; flex-shrink: 0; display: flex; align-items: center;">
+                                    <?= $headerIcon ?>
+                                </div>
                             <?php endif; ?>
                             <div>
                                 <h1 class="font-serif" style="margin: 0; line-height: 1.2;">
