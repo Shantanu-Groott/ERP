@@ -19,21 +19,59 @@ class CareerController
 
         $db = Database::getConnection();
 
+        $sql = "
+            SELECT * FROM job_openings 
+            WHERE status = 'active'
+        ";
+        $params = [];
+
         if ($search !== '') {
-            $stmt = $db->prepare("
-                SELECT * FROM job_openings 
-                WHERE status = 'active' 
-                  AND (company_name LIKE :s OR title LIKE :s OR skills LIKE :s OR description LIKE :s)
-                ORDER BY id DESC
-            ");
-            $stmt->execute(['s' => '%' . $search . '%']);
-        } else {
-            $stmt = $db->query("SELECT * FROM job_openings WHERE status = 'active' ORDER BY id DESC");
+            $sql .= " AND (company_name LIKE :s OR title LIKE :s OR skills LIKE :s OR description LIKE :s)";
+            $params['s'] = '%' . $search . '%';
         }
-        $openings = $stmt->fetchAll();
+
+        // Prioritize the 3 mockup cards: Cyber Security Intern, Tech Fest Volunteer, Full Stack Developer
+        $sql .= "
+            ORDER BY 
+                CASE 
+                    WHEN title LIKE '%Cyber Security Intern%' THEN 1
+                    WHEN title LIKE '%Tech Fest Volunteer%' THEN 2
+                    WHEN title LIKE '%Full Stack Developer (Fresher)%' THEN 3
+                    ELSE 4
+                END ASC,
+                id DESC
+        ";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        $rawOpenings = $stmt->fetchAll();
+
+        $openings = array_map(function ($op) {
+            $titleLower = strtolower($op['title']);
+            $typeLower = strtolower($op['employment_type']);
+
+            if (str_contains($titleLower, 'volunteer') || str_contains($typeLower, 'part-time') || str_contains($typeLower, 'part time')) {
+                $category = 'part-time';
+                $roleLabel = str_contains($titleLower, 'volunteer') ? 'Volunteer' : 'Part-Time';
+                $icon = 'users';
+            } elseif (str_contains($titleLower, 'intern') || str_contains($typeLower, 'intern')) {
+                $category = 'internship';
+                $roleLabel = 'Internship';
+                $icon = 'laptop';
+            } else {
+                $category = 'full-time';
+                $roleLabel = 'Full-Time';
+                $icon = 'desktop';
+            }
+
+            $op['category'] = $category;
+            $op['role_label'] = $roleLabel;
+            $op['icon_type'] = $icon;
+            return $op;
+        }, $rawOpenings);
 
         View::render('student.openings', [
-            'title' => 'Placement Desk & Career Openings',
+            'title' => 'Openings - Kalavanta Edutech',
             'student' => $student,
             'openings' => $openings,
             'search' => $search,
