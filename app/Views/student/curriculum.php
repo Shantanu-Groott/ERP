@@ -168,31 +168,22 @@ $activeCourseCode = $selectedTrack ?? 'CYB302';
                             </div>
                         </div>
 
-                        <!-- Right: Progress Bar + Percentage + Action Button -->
-                        <div style="display: flex; align-items: center; gap: 24px; flex-shrink: 0;">
+                        <!-- Right: Progress Bar + Percentage + Action Button (Strict Linear Grid Alignment) -->
+                        <div class="course-metrics-group">
                             
                             <div class="course-progress-bar-wrap" style="width: 240px; height: 6px; background: #e2ece4; border-radius: 999px; overflow: hidden;">
                                 <div style="width: <?= $prog ?>%; height: 100%; background: #1c4b32; border-radius: 999px; transition: width 0.4s ease;"></div>
                             </div>
 
-                            <span style="font-size: 0.86rem; font-weight: 700; color: #183324; width: 44px; text-align: right; flex-shrink: 0;">
+                            <span class="course-percent-num">
                                 <?= $prog ?>%
                             </span>
 
-                            <!-- Action Button: Continue for Enrolled, View for Catalog/Others -->
-                            <?php if ($isEnrolled): ?>
-                                <button type="button" class="action-pill-btn btn-continue" onclick="showModulesView('<?= htmlspecialchars($code) ?>')" 
-                                        style="padding: 7px 20px; border-radius: 999px; background: #eaf1eb; color: #1c4b32; font-weight: 600; font-size: 0.83rem; border: 1px solid #d4e2d6; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease; font-family: inherit;">
-                                    <span>Continue</span>
-                                    <span style="font-size: 0.95rem;">&rarr;</span>
-                                </button>
-                            <?php else: ?>
-                                <button type="button" class="action-pill-btn btn-view" onclick="showModulesView('<?= htmlspecialchars($code) ?>')" 
-                                        style="padding: 7px 20px; border-radius: 999px; background: #eaf1eb; color: #1c4b32; font-weight: 600; font-size: 0.83rem; border: 1px solid #d4e2d6; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease; font-family: inherit;">
-                                    <span>View</span>
-                                    <span style="font-size: 0.95rem;">&rarr;</span>
-                                </button>
-                            <?php endif; ?>
+                            <!-- Action Button: Exactly 120px across Continue and View -->
+                            <button type="button" class="action-pill-btn <?= $isEnrolled ? 'btn-continue' : 'btn-view' ?>" onclick="showModulesView('<?= htmlspecialchars($code) ?>')">
+                                <span><?= $isEnrolled ? 'Continue' : 'View' ?></span>
+                                <span style="font-size: 0.95rem;">&rarr;</span>
+                            </button>
 
                         </div>
 
@@ -406,6 +397,42 @@ window.__ACTIVE_COURSE_CODE__ = <?= json_encode($activeCourseCode) ?>;
 .course-row-item:hover {
     background: #fafcfb;
 }
+.course-metrics-group {
+    display: grid;
+    grid-template-columns: 240px 48px 120px;
+    gap: 20px;
+    align-items: center;
+    flex-shrink: 0;
+}
+.course-percent-num {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: #183324;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    display: block;
+}
+.action-pill-btn {
+    width: 120px;
+    height: 36px;
+    border-radius: 999px;
+    background: #eaf1eb;
+    color: #1c4b32;
+    font-weight: 600;
+    font-size: 0.83rem;
+    border: 1px solid #d4e2d6;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+    font-family: inherit;
+    box-sizing: border-box;
+    white-space: nowrap;
+    text-decoration: none;
+}
 .action-pill-btn:hover {
     background: #1c4b32 !important;
     color: #ffffff !important;
@@ -445,12 +472,23 @@ window.__ACTIVE_COURSE_CODE__ = <?= json_encode($activeCourseCode) ?>;
         align-items: flex-start !important;
         gap: 14px !important;
     }
-    .course-row-item > div:last-child {
+    .course-metrics-group {
         width: 100% !important;
-        justify-content: space-between !important;
+        grid-template-columns: 1fr auto auto !important;
+        gap: 14px !important;
     }
     .course-progress-bar-wrap {
-        width: 140px !important;
+        width: 100% !important;
+    }
+}
+@media (max-width: 580px) {
+    .course-metrics-group {
+        grid-template-columns: 1fr auto !important;
+        gap: 10px !important;
+    }
+    .course-metrics-group .action-pill-btn {
+        grid-column: span 2;
+        width: 100% !important;
     }
 }
 </style>
