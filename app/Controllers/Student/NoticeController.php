@@ -31,110 +31,64 @@ class NoticeController
         ");
         $rawNotices = $stmt->fetchAll();
 
-        // Process notices with rich metadata (category, priority, reference number, read time, department)
         $notices = [];
-        $counts = [
-            'all' => count($rawNotices),
-            'important' => 0,
-            'exam' => 0,
-            'career' => 0,
-            'academic' => 0,
-            'system' => 0,
-        ];
-
-        foreach ($rawNotices as $idx => $n) {
+        foreach ($rawNotices as $n) {
             $titleLower = strtolower($n['title']);
-            $bodyLower = strtolower($n['body']);
             
-            // Intelligent categorization
+            // Clean simple categorization
             if (strpos($titleLower, 'exam') !== false || strpos($titleLower, 'hall ticket') !== false || strpos($titleLower, 'assessment') !== false) {
                 $category = 'exam';
                 $categoryLabel = 'Examination';
                 $badgeBg = '#eaf5ee';
                 $badgeColor = '#1c4b32';
-                $icon = 'exam';
-                $priority = 'urgent';
-            } elseif (strpos($titleLower, 'hackathon') !== false || strpos($titleLower, 'internship') !== false || strpos($titleLower, 'recruitment') !== false || strpos($titleLower, 'career') !== false) {
-                $category = 'career';
-                $categoryLabel = 'Career & Events';
+                $isUrgent = true;
+            } elseif (strpos($titleLower, 'hackathon') !== false || strpos($titleLower, 'internship') !== false || strpos($titleLower, 'recruitment') !== false) {
+                $category = 'event';
+                $categoryLabel = 'Event & Career';
                 $badgeBg = '#f3e8ff';
                 $badgeColor = '#6b21a8';
-                $icon = 'briefcase';
-                $priority = 'high';
-            } elseif (strpos($titleLower, 'maintenance') !== false || strpos($titleLower, 'sandbox') !== false || strpos($titleLower, 'cluster') !== false || strpos($titleLower, 'terminal') !== false) {
+                $isUrgent = false;
+            } elseif (strpos($titleLower, 'maintenance') !== false || strpos($titleLower, 'sandbox') !== false) {
                 $category = 'system';
-                $categoryLabel = 'Infrastructure';
+                $categoryLabel = 'System';
                 $badgeBg = '#fef3c7';
                 $badgeColor = '#92400e';
-                $icon = 'server';
-                $priority = 'normal';
+                $isUrgent = false;
             } else {
                 $category = 'academic';
-                $categoryLabel = 'Academic & Syllabus';
+                $categoryLabel = 'Academic';
                 $badgeBg = '#e0f2fe';
                 $badgeColor = '#0369a1';
-                $icon = 'book';
-                $priority = (strpos($titleLower, 'welcome') !== false) ? 'normal' : 'high';
+                $isUrgent = (strpos($titleLower, 'review') !== false || strpos($titleLower, 'guidelines') !== false);
             }
 
-            if ($priority === 'urgent' || $priority === 'high') {
-                $counts['important']++;
-            }
-            if (isset($counts[$category])) {
-                $counts[$category]++;
-            }
-
-            // Word count / read time
-            $wordCount = str_word_count(strip_tags($n['body']));
-            $readTime = max(1, ceil($wordCount / 120)) . ' min read';
-
-            // Circular reference number
-            $refNo = 'KE-CIR-' . date('Y', strtotime($n['created_at'])) . '-' . str_pad((string)$n['id'], 3, '0', STR_PAD_LEFT);
-
-            // Issuing department
-            if ($category === 'exam') {
-                $department = 'Office of the Controller of Examinations';
-            } elseif ($category === 'career') {
-                $department = 'Placement & Corporate Relations Cell';
-            } elseif ($category === 'system') {
-                $department = 'Cloud Systems & IT Infrastructure Wing';
-            } else {
-                $department = 'Dean of Academic Affairs';
-            }
+            $dateTs = !empty($n['created_at']) ? strtotime($n['created_at']) : time();
 
             $notices[] = [
                 'id' => $n['id'],
-                'ref_no' => $refNo,
                 'title' => $n['title'],
                 'body' => $n['body'],
                 'created_at' => $n['created_at'],
-                'formatted_date' => date('M d, Y', strtotime($n['created_at'])),
-                'relative_date' => date('d M', strtotime($n['created_at'])),
-                'author_name' => $n['author_name'] ?? 'Academic Secretariat',
-                'department' => $department,
-                'audience' => $n['audience'],
-                'audience_label' => ($n['audience'] === 'all') ? 'Campus Wide' : 'Student Body (All Semesters)',
+                'formatted_date' => date('M d, Y', $dateTs),
+                'month' => strtoupper(date('M', $dateTs)),
+                'day' => date('d', $dateTs),
+                'author_name' => $n['author_name'] ?? 'Administration',
                 'category' => $category,
                 'category_label' => $categoryLabel,
                 'badge_bg' => $badgeBg,
                 'badge_color' => $badgeColor,
-                'priority' => $priority,
-                'priority_label' => ($priority === 'urgent') ? 'Urgent / Mandatory' : (($priority === 'high') ? 'High Priority' : 'General Circular'),
-                'icon' => $icon,
-                'read_time' => $readTime,
-                'is_featured' => ($idx === 0),
+                'is_urgent' => $isUrgent,
             ];
         }
 
         View::render('student.notices', [
-            'title' => 'Notices & Bulletins - Kalavanta Edutech',
-            'headerTitle' => 'Notices & Bulletins',
-            'headerSubtitle' => 'Official circulars, examination schedules, and institutional announcements',
+            'title' => 'Notices - Kalavanta Edutech',
+            'headerTitle' => 'Notices',
+            'headerSubtitle' => 'Important campus announcements and academic notices',
             'headerIcon' => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
-            'searchPlaceholder' => 'Search circulars, topics, keywords...',
+            'searchPlaceholder' => 'Search notices...',
             'student' => $student,
             'notices' => $notices,
-            'counts' => $counts,
         ], 'student');
     }
 }
