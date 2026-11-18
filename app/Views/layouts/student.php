@@ -589,9 +589,9 @@
                             </div>
                         </div>
                     <?php else: ?>
-                        <h1 class="font-serif">
-                            Welcome back, <?= htmlspecialchars(explode(' ', (string)\App\Core\Session::get('user_name', 'Shantanu'))[0]) ?>!
-                            <span style="font-size: 1.8rem;">👋</span>
+                        <h1 class="font-serif" style="display: inline-flex; align-items: center; gap: 8px;">
+                            <span>Welcome back, <?= htmlspecialchars(explode(' ', (string)\App\Core\Session::get('user_name', 'Shantanu'))[0]) ?>!</span>
+                            <img src="/assets/img/wave-hand.png" alt="Wave" style="height: 38px; width: auto; object-fit: contain; vertical-align: middle; display: inline-block;">
                         </h1>
                     <?php endif; ?>
                 </div>

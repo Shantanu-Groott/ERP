@@ -90,20 +90,48 @@ class CareerController
 
         $db = Database::getConnection();
 
+        $sql = "SELECT * FROM student_projects WHERE status = 'open' OR status = 'in_progress'";
+        $params = [];
         if ($search !== '') {
-            $stmt = $db->prepare("
-                SELECT * FROM student_projects 
-                WHERE (company_name LIKE :s OR title LIKE :s OR skills LIKE :s OR description LIKE :s)
-                ORDER BY id DESC
-            ");
-            $stmt->execute(['s' => '%' . $search . '%']);
-        } else {
-            $stmt = $db->query("SELECT * FROM student_projects ORDER BY id DESC");
+            $sql .= " AND (company_name LIKE :s OR title LIKE :s OR skills LIKE :s OR description LIKE :s)";
+            $params['s'] = '%' . $search . '%';
         }
-        $projects = $stmt->fetchAll();
+        $sql .= " ORDER BY id ASC";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        $rawProjects = $stmt->fetchAll();
+
+        $projects = array_map(function ($pr) {
+            $typeLower = strtolower($pr['project_type'] ?? '');
+            $titleLower = strtolower($pr['title'] ?? '');
+
+            if (str_contains($typeLower, 'cyber') || str_contains($titleLower, 'pentest') || str_contains($titleLower, 'security')) {
+                $category = 'cybersecurity';
+                $catLabel = 'Cybersecurity';
+                $icon = 'shield';
+            } elseif (str_contains($typeLower, 'cloud') || str_contains($titleLower, 'kubernetes') || str_contains($titleLower, 'devops') || str_contains($typeLower, 'practical')) {
+                $category = 'cloud';
+                $catLabel = 'Cloud & DevOps';
+                $icon = 'cloud';
+            } else {
+                $category = 'capstone';
+                $catLabel = 'Capstone';
+                $icon = 'database';
+            }
+
+            $pr['category'] = $category;
+            $pr['category_label'] = $catLabel;
+            $pr['icon_type'] = $icon;
+            return $pr;
+        }, $rawProjects);
 
         View::render('student.projects', [
-            'title' => 'Industry Projects & Capstones',
+            'title' => 'Projects - Kalavanta Edutech',
+            'headerTitle' => 'Projects',
+            'headerSubtitle' => 'Explore industry capstones and sponsored lab projects',
+            'headerIcon' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>',
+            'searchPlaceholder' => 'Search projects, tech stack, sponsors...',
             'student' => $student,
             'projects' => $projects,
             'search' => $search,
