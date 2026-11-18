@@ -21,9 +21,35 @@ $lateExcusedDisplay = 1; // Matches mockup "1 Days"
 $totalCount = (int)($stats['total'] ?? count($records));
 $currentFilter = $filter ?? 'all';
 
-// SVG circle radius 38, circumference = 2 * PI * 38 = 238.76
-$circumference = 238.76;
-$dashOffset = round($circumference * (1 - ($pct / 100)), 2);
+// Dynamic Attendance Donut Gauge (Enlarged with Dynamic Color Thresholds)
+// Radius 50, Circumference = 2 * PI * 50 = 314.16
+$circumference = 314.16;
+$clampedPct = min(max($pct, 0), 100);
+$dashOffset = round($circumference * (1 - ($clampedPct / 100)), 2);
+
+// Color thresholds based on mandatory 75% exam eligibility requirement:
+// - Green: >= 75% (Safe / Eligible)
+// - Amber: 60% - 74.9% (Warning / Low attendance notice)
+// - Red: < 60% (Critical / Below threshold)
+if ($pct >= 75.0) {
+    $gaugeRingColor = '#2d6a4f';
+    $gaugeTrackColor = '#e2ece4';
+    $gaugeTextColor = '#183324';
+    $gaugeStatusLabel = 'PRESENT';
+    $gaugeStatusColor = '#2d6a4f';
+} elseif ($pct >= 60.0) {
+    $gaugeRingColor = '#f59e0b';
+    $gaugeTrackColor = '#fef3c7';
+    $gaugeTextColor = '#92400e';
+    $gaugeStatusLabel = 'WARNING';
+    $gaugeStatusColor = '#b45309';
+} else {
+    $gaugeRingColor = '#dc2626';
+    $gaugeTrackColor = '#fee2e2';
+    $gaugeTextColor = '#991b1b';
+    $gaugeStatusLabel = 'CRITICAL';
+    $gaugeStatusColor = '#dc2626';
+}
 
 // =========================================================
 // Dynamic GitHub-style Calendar Generation (365 / 366 Boxes)
@@ -168,23 +194,23 @@ while ($curDate <= $yearEnd || $curDate->format('Y') == $calendarYear) {
         <!-- Right: Donut Progress Gauge + Stats Breakdown -->
         <div style="display: flex; align-items: center; gap: 32px; flex-wrap: wrap;">
             
-            <!-- Circular Donut Gauge -->
-            <div style="position: relative; width: 92px; height: 92px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                <svg width="92" height="92" viewBox="0 0 92 92">
+            <!-- Circular Donut Gauge (Enlarged to 118px & Dynamic Color) -->
+            <div style="position: relative; width: 118px; height: 118px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <svg width="118" height="118" viewBox="0 0 120 120">
                     <!-- Background circle track -->
-                    <circle cx="46" cy="46" r="38" stroke="#e2ece4" stroke-width="7" fill="none" />
-                    <!-- Foreground progress ring -->
-                    <circle cx="46" cy="46" r="38" stroke="#2d6a4f" stroke-width="7" stroke-linecap="round" fill="none"
-                            stroke-dasharray="238.76" 
+                    <circle cx="60" cy="60" r="50" stroke="<?= $gaugeTrackColor ?>" stroke-width="8.5" fill="none" />
+                    <!-- Foreground progress ring with dynamic attendance color -->
+                    <circle cx="60" cy="60" r="50" stroke="<?= $gaugeRingColor ?>" stroke-width="8.5" stroke-linecap="round" fill="none"
+                            stroke-dasharray="314.16" 
                             stroke-dashoffset="<?= $dashOffset ?>"
-                            style="transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dashoffset 0.6s ease;" />
+                            style="transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dashoffset 0.6s ease, stroke 0.3s ease;" />
                 </svg>
                 <div style="position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-                    <span style="font-size: 1.18rem; font-weight: 800; color: #183324; font-variant-numeric: tabular-nums; line-height: 1;">
+                    <span style="font-size: 1.55rem; font-weight: 800; color: <?= $gaugeTextColor ?>; font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: -0.5px;">
                         <?= number_format($pct, 1) ?>%
                     </span>
-                    <span style="font-size: 0.62rem; font-weight: 800; color: #183324; letter-spacing: 0.6px; text-transform: uppercase; margin-top: 3px;">
-                        PRESENT
+                    <span style="font-size: 0.68rem; font-weight: 800; color: <?= $gaugeStatusColor ?>; letter-spacing: 0.8px; text-transform: uppercase; margin-top: 4px;">
+                        <?= $gaugeStatusLabel ?>
                     </span>
                 </div>
             </div>
