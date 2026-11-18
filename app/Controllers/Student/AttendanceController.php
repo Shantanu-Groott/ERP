@@ -25,7 +25,7 @@ class AttendanceController
             $stats = Attendance::getStudentStats($student['id']);
 
             if ($filter !== 'all') {
-                $records = array_filter($allRecords, fn($r) => ($r['status'] ?? '') === $filter);
+                $records = array_values(array_filter($allRecords, fn($r) => ($r['status'] ?? '') === $filter));
             } else {
                 $records = $allRecords;
             }
@@ -35,6 +35,7 @@ class AttendanceController
             'title' => 'Class Attendance & Session Archives',
             'student' => $student,
             'records' => $records,
+            'allRecords' => $allRecords ?? [],
             'stats' => $stats,
             'filter' => $filter,
         ], 'student');

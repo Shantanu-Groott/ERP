@@ -51,7 +51,8 @@ class Attendance
                 COUNT(*) as total_days,
                 SUM(CASE WHEN status = 'present' THEN 1 ELSE 0 END) as present_days,
                 SUM(CASE WHEN status = 'absent' THEN 1 ELSE 0 END) as absent_days,
-                SUM(CASE WHEN status = 'late' THEN 1 ELSE 0 END) as late_days
+                SUM(CASE WHEN status = 'late' THEN 1 ELSE 0 END) as late_days,
+                SUM(CASE WHEN status = 'excused' THEN 1 ELSE 0 END) as excused_days
             FROM attendance
             WHERE student_id = :student_id
         ");
@@ -60,12 +61,16 @@ class Attendance
         $total = (int)($stats['total_days'] ?? 0);
         $present = (int)($stats['present_days'] ?? 0);
         $percentage = $total > 0 ? round(($present / $total) * 100, 1) : 0;
+        $late = (int)($stats['late_days'] ?? 0);
+        $excused = (int)($stats['excused_days'] ?? 0);
         
         return [
             'total' => $total,
             'present' => $present,
             'absent' => (int)($stats['absent_days'] ?? 0),
-            'late' => (int)($stats['late_days'] ?? 0),
+            'late' => $late,
+            'excused' => $excused,
+            'late_excused' => $late + $excused,
             'percentage' => $percentage,
         ];
     }
