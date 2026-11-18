@@ -48,11 +48,11 @@ $rollNo = $student['roll_no'] ?? 'KE-STU-2025';
                  style="background: #ffffff; border: 1px solid #eef2ef; border-radius: 18px; padding: 18px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px; transition: all 0.15s ease;">
                 
                 <!-- Left: Certificate Icon + Title & Description -->
-                <div style="display: flex; align-items: center; gap: 18px; flex: 1; min-width: 280px;">
+                <div style="display: flex; align-items: center; gap: 20px; flex: 1; min-width: 280px;">
                     
-                    <!-- Illustrated Certificate Icon with Rosette Ribbon Seal -->
-                    <div style="width: 70px; height: 56px; border-radius: 14px; background: <?= $c['icon_bg'] ?>; border: 1px solid <?= $c['border_color'] ?>; color: <?= $c['icon_color'] ?>; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        <svg width="42" height="34" viewBox="0 0 42 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Standalone Enlarged Certificate Icon (Box container removed) -->
+                    <div style="display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: <?= $c['icon_color'] ?>;">
+                        <svg width="74" height="60" viewBox="0 0 42 34" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block;">
                             <!-- Certificate Outer Rect -->
                             <rect x="2" y="2" width="34" height="25" rx="3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                             <!-- Inner decorative text lines -->
