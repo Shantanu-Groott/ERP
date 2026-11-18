@@ -8,22 +8,8 @@
 <div class="openings-desk-wrapper" style="max-width: 1200px; margin: 0 auto;">
 
     <!-- Main White Container Card -->
-    <div style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 22px; padding: 28px 32px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);">
+    <div style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 22px; padding: 24px 28px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);">
         
-        <!-- Header: Briefcase Icon + Openings Title & Subtitle -->
-        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 26px;">
-            <div style="width: 54px; height: 54px; border-radius: 14px; background: #eaf5ee; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #2d6a4f;">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="7" width="20" height="14" rx="3" ry="3"></rect>
-                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                </svg>
-            </div>
-            <div>
-                <h1 style="font-size: 1.65rem; font-weight: 800; color: #183324; margin: 0; line-height: 1.2; letter-spacing: -0.3px;">Openings</h1>
-                <p style="font-size: 0.9rem; color: #627467; margin: 4px 0 0 0; font-weight: 500;">Explore latest opportunities and apply</p>
-            </div>
-        </div>
-
         <!-- Filter Pills & Sort Bar -->
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 22px;">
             

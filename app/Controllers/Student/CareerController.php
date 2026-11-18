@@ -72,6 +72,10 @@ class CareerController
 
         View::render('student.openings', [
             'title' => 'Openings - Kalavanta Edutech',
+            'headerTitle' => 'Openings',
+            'headerSubtitle' => 'Explore latest opportunities and apply',
+            'headerIcon' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
+            'searchPlaceholder' => 'Search openings, companies, skills...',
             'student' => $student,
             'openings' => $openings,
             'search' => $search,
