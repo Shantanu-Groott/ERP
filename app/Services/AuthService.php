@@ -28,42 +28,82 @@ final class AuthService
         $table = 'users';
 
         if (self::throttled($pdo, $id, $ip)) {
-            return ['success' => false, 'message' => self::THROTTLED];
+            return [
+                'success' => false, 
+                'message' => 'Too many failed login attempts from this network. For security, please wait a few minutes before trying again.'
+            ];
         }
 
         $user = self::findUser($pdo, $id);
 
-        // Always run exactly one Argon2/Bcrypt verification, found or not,
-        // so response time does not reveal whether the account exists.
-        $ok = password_verify($password, $user['password_hash'] ?? self::dummyHash());
-
-        if (
-            !$user || !$ok
-            || (bool)$user['is_locked']
-            || $user['status'] !== 'active'
-        ) {
-            if ($user && !(bool)$user['is_locked']) {
-                // If previous lockout expired, restart counter from 1; otherwise increment and lock when threshold reached
-                $hasExpiredLock = (!empty($user['locked_until']) && strtotime((string)$user['locked_until']) <= time());
-                if ($hasExpiredLock) {
-                    $pdo->prepare("UPDATE {$table} SET failed_attempts = 1, locked_until = NULL WHERE id = :id")
-                        ->execute(['id' => $user['id']]);
-                } else {
-                    $stmtLock = $pdo->prepare(
-                        "UPDATE {$table}
-                            SET failed_attempts = failed_attempts + 1,
-                                locked_until = CASE
-                                    WHEN failed_attempts >= :max THEN DATE_ADD(NOW(), INTERVAL " . self::LOCK_MIN . " MINUTE)
-                                    ELSE locked_until
-                                END
-                          WHERE id = :id"
-                    );
-                    $stmtLock->execute(['max' => self::MAX_ACCOUNT_FAILS, 'id' => $user['id']]);
-                }
-            }
+        // Case 1: Account does not exist
+        if (!$user) {
             self::record($pdo, $id, $ip, false);
-            AuditService::log($user ? (int)$user['id'] : null, 'login.failed', 'auth', $user ? (int)$user['id'] : null, ['ip' => $ip]);
-            return ['success' => false, 'message' => self::GENERIC];
+            AuditService::log(null, 'login.failed', 'auth', null, ['ip' => $ip, 'reason' => 'user_not_found']);
+            return [
+                'success' => false,
+                'message' => "No account found with username or email '{$identifier}'. Please verify your spelling or contact your administrator."
+            ];
+        }
+
+        // Case 2: Account is locked due to too many failed attempts
+        if ((bool)$user['is_locked']) {
+            self::record($pdo, $id, $ip, false);
+            AuditService::log((int)$user['id'], 'login.failed', 'auth', (int)$user['id'], ['ip' => $ip, 'reason' => 'account_locked']);
+            $lockedTime = !empty($user['locked_until']) ? date('g:i A', strtotime((string)$user['locked_until'])) : '15 minutes';
+            return [
+                'success' => false,
+                'message' => "This account is temporarily locked due to multiple failed attempts. Please try again after {$lockedTime} or reset your password."
+            ];
+        }
+
+        // Case 3: Account is inactive or suspended
+        if ($user['status'] !== 'active') {
+            self::record($pdo, $id, $ip, false);
+            AuditService::log((int)$user['id'], 'login.failed', 'auth', (int)$user['id'], ['ip' => $ip, 'reason' => 'account_inactive']);
+            $statusName = ucfirst((string)$user['status']);
+            return [
+                'success' => false,
+                'message' => "This account is currently {$statusName} (not active). Please contact the institute administrator to activate your account."
+            ];
+        }
+
+        // Case 4: Verify password
+        $ok = password_verify($password, $user['password_hash']);
+
+        if (!$ok) {
+            // If previous lockout expired, restart counter from 1; otherwise increment and lock when threshold reached
+            $hasExpiredLock = (!empty($user['locked_until']) && strtotime((string)$user['locked_until']) <= time());
+            if ($hasExpiredLock) {
+                $pdo->prepare("UPDATE {$table} SET failed_attempts = 1, locked_until = NULL WHERE id = :id")
+                    ->execute(['id' => $user['id']]);
+                $attemptsSoFar = 1;
+            } else {
+                $stmtLock = $pdo->prepare(
+                    "UPDATE {$table}
+                        SET failed_attempts = failed_attempts + 1,
+                            locked_until = CASE
+                                WHEN failed_attempts >= :max THEN DATE_ADD(NOW(), INTERVAL " . self::LOCK_MIN . " MINUTE)
+                                ELSE locked_until
+                            END
+                      WHERE id = :id"
+                );
+                $stmtLock->execute(['max' => self::MAX_ACCOUNT_FAILS, 'id' => $user['id']]);
+                $attemptsSoFar = (int)$user['failed_attempts'] + 1;
+            }
+
+            self::record($pdo, $id, $ip, false);
+            AuditService::log((int)$user['id'], 'login.failed', 'auth', (int)$user['id'], ['ip' => $ip, 'reason' => 'invalid_password']);
+
+            $remaining = self::MAX_ACCOUNT_FAILS - $attemptsSoFar;
+            $attemptWarning = ($remaining > 0 && $remaining <= 3)
+                ? " ({$remaining} attempt" . ($remaining === 1 ? '' : 's') . " left before temporary lockout)"
+                : "";
+
+            return [
+                'success' => false,
+                'message' => "Incorrect password for this account.{$attemptWarning} Please verify your password or use 'Forgot Password'."
+            ];
         }
 
         // Upgrade the hash silently if the cost parameters have changed

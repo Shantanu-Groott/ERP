@@ -591,7 +591,7 @@
                     <?php else: ?>
                         <h1 class="font-serif">
                             Welcome back, <?= htmlspecialchars(explode(' ', (string)\App\Core\Session::get('user_name', 'Shantanu'))[0]) ?>!
-                            <img src="/assets/img/wave-hand.png" alt="Wave" style="height: 82px; width: auto; object-fit: contain; vertical-align: middle; margin-left: 1px; display: inline-block;">
+                            <img src="/assets/img/wave-hand.png" alt="Wave" style="height: 82px; width: auto; object-fit: contain; vertical-align: middle; margin-left: 8px; display: inline-block;">
                         </h1>
                     <?php endif; ?>
                 </div>

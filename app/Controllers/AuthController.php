@@ -37,8 +37,24 @@ final class AuthController
         $identifier = $this->field($request, 'identifier');
         $password   = $this->field($request, 'password', false);
 
-        if ($identifier === '' || $password === '' || mb_strlen($identifier) > 190 || strlen($password) > 1024) {
+        if ($identifier === '' && $password === '') {
             $this->back($response, '/login', 'error', 'Please enter your username or email and your password.');
+            return;
+        }
+
+        if ($identifier === '') {
+            $this->back($response, '/login', 'error', 'Please enter your username or email address.');
+            return;
+        }
+
+        if ($password === '') {
+            Session::flash('identifier', $identifier);
+            $this->back($response, '/login', 'error', 'Please enter your password.');
+            return;
+        }
+
+        if (mb_strlen($identifier) > 190 || strlen($password) > 1024) {
+            $this->back($response, '/login', 'error', 'Input exceeds maximum allowed length.');
             return;
         }
 

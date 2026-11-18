@@ -186,7 +186,7 @@
                                             'email' => $pr['contact_email'] ?? '',
                                             'is_past' => false
                                         ])) ?>)">
-                                    <span>Join Project</span>
+                                    <span>View Project</span>
                                     <span style="font-size: 1.05rem; line-height: 1;">&rarr;</span>
                                 </button>
                             <?php endif; ?>
