@@ -13,8 +13,9 @@
 $avg = (float)($overallPercentage ?? 87.5);
 $examCount = (int)($totalExams ?? count($marks));
 
-// SVG circle radius 48, circumference = 2 * PI * 48 = 301.59
-$circumference = 301.59;
+// SVG circle radius 75, circumference = 2 * PI * 75 = 471.24
+$gaugeRadius = 75;
+$circumference = 471.24;
 $clampedAvg = min(max($avg, 0), 100);
 $dashOffset = round($circumference * (1 - ($clampedAvg / 100)), 2);
 
@@ -151,7 +152,7 @@ $low = $lowestScore ?? ['score' => 72.0, 'subject' => 'Ethical Hacking'];
     <!-- ==================================================== -->
     <!-- 2. MIDDLE SECTION: PERFORMANCE TREND + GRADE DONUT   -->
     <!-- ==================================================== -->
-    <div style="display: grid; grid-template-columns: minmax(460px, 1.8fr) minmax(320px, 1.2fr); gap: 20px; align-items: stretch;" class="trend-donut-grid">
+    <div style="display: grid; grid-template-columns: minmax(460px, 1.7fr) minmax(340px, 1.3fr); gap: 20px; align-items: stretch;" class="trend-donut-grid">
         
         <!-- Left: Performance Trend Card -->
         <div style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 22px; padding: 22px 26px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between;">
@@ -206,66 +207,71 @@ $low = $lowestScore ?? ['score' => 72.0, 'subject' => 'Ethical Hacking'];
 
                     <!-- Area fill under spline -->
                     <path id="trendAreaPath" 
-                          d="M60 180 L60 58.4 Q110 54, 160 51.2 T260 44 T360 48.8 T460 39.2 T560 40 L560 180 Z" 
+                          d="M60 180 L60 58.4 C76.7 57.2, 126.7 53.6, 160 51.2 C193.3 48.8, 226.7 45.2, 260 44 C293.3 42.8, 326.7 49.6, 360 48.8 C393.3 48.0, 426.7 38.4, 460 39.2 C493.3 40.0, 526.7 40.0, 560 40 L560 180 Z" 
                           fill="url(#trendGrad)" />
 
                     <!-- Smooth green spline line -->
                     <path id="trendLinePath" 
-                          d="M60 58.4 Q110 54, 160 51.2 T260 44 T360 48.8 T460 39.2 T560 40" 
+                          d="M60 58.4 C76.7 57.2, 126.7 53.6, 160 51.2 C193.3 48.8, 226.7 45.2, 260 44 C293.3 42.8, 326.7 49.6, 360 48.8 C393.3 48.0, 426.7 38.4, 460 39.2 C493.3 40.0, 526.7 40.0, 560 40" 
                           fill="none" stroke="#2d6a4f" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
 
-                    <!-- Point 1: Nov 76.0% (X: 60, Y: 58.4) -->
-                    <text x="60" y="46" fill="#183324" font-size="11" font-weight="700" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">76.0%</text>
-                    <circle cx="60" cy="58.4" r="4.5" fill="#ffffff" stroke="#2d6a4f" stroke-width="2.5"/>
-                    <text x="60" y="202" fill="#718576" font-size="11" font-weight="600" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">Nov</text>
+                    <!-- Dynamic Group for points, score labels, active badge, and bottom X-axis months -->
+                    <g id="trendDynamicGroup">
+                        <!-- Point 1: Nov 76.0% (X: 60, Y: 58.4) -->
+                        <text x="60" y="46" fill="#183324" font-size="11" font-weight="700" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">76.0%</text>
+                        <circle cx="60" cy="58.4" r="4.5" fill="#ffffff" stroke="#2d6a4f" stroke-width="2.5"/>
+                        <text x="60" y="202" fill="#718576" font-size="11" font-weight="600" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">Nov</text>
 
-                    <!-- Point 2: Dec 80.5% (X: 160, Y: 51.2) -->
-                    <text x="160" y="38" fill="#183324" font-size="11" font-weight="700" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">80.5%</text>
-                    <circle cx="160" cy="51.2" r="4.5" fill="#ffffff" stroke="#2d6a4f" stroke-width="2.5"/>
-                    <text x="160" y="202" fill="#718576" font-size="11" font-weight="600" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">Dec</text>
+                        <!-- Point 2: Dec 80.5% (X: 160, Y: 51.2) -->
+                        <text x="160" y="38" fill="#183324" font-size="11" font-weight="700" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">80.5%</text>
+                        <circle cx="160" cy="51.2" r="4.5" fill="#ffffff" stroke="#2d6a4f" stroke-width="2.5"/>
+                        <text x="160" y="202" fill="#718576" font-size="11" font-weight="600" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">Dec</text>
 
-                    <!-- Point 3: Jan 85.0% (X: 260, Y: 44) -->
-                    <text x="260" y="30" fill="#183324" font-size="11" font-weight="700" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">85.0%</text>
-                    <circle cx="260" cy="44" r="4.5" fill="#ffffff" stroke="#2d6a4f" stroke-width="2.5"/>
-                    <text x="260" y="202" fill="#718576" font-size="11" font-weight="600" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">Jan</text>
+                        <!-- Point 3: Jan 85.0% (X: 260, Y: 44) -->
+                        <text x="260" y="30" fill="#183324" font-size="11" font-weight="700" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">85.0%</text>
+                        <circle cx="260" cy="44" r="4.5" fill="#ffffff" stroke="#2d6a4f" stroke-width="2.5"/>
+                        <text x="260" y="202" fill="#718576" font-size="11" font-weight="600" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">Jan</text>
 
-                    <!-- Point 4: Feb 82.0% (X: 360, Y: 48.8) -->
-                    <text x="360" y="36" fill="#183324" font-size="11" font-weight="700" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">82.0%</text>
-                    <circle cx="360" cy="48.8" r="4.5" fill="#ffffff" stroke="#2d6a4f" stroke-width="2.5"/>
-                    <text x="360" y="202" fill="#718576" font-size="11" font-weight="600" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">Feb</text>
+                        <!-- Point 4: Feb 82.0% (X: 360, Y: 48.8) -->
+                        <text x="360" y="36" fill="#183324" font-size="11" font-weight="700" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">82.0%</text>
+                        <circle cx="360" cy="48.8" r="4.5" fill="#ffffff" stroke="#2d6a4f" stroke-width="2.5"/>
+                        <text x="360" y="202" fill="#718576" font-size="11" font-weight="600" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">Feb</text>
 
-                    <!-- Point 5: Mar 88.0% (X: 460, Y: 39.2) -->
-                    <text x="460" y="26" fill="#183324" font-size="11" font-weight="700" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">88.0%</text>
-                    <circle cx="460" cy="39.2" r="4.5" fill="#ffffff" stroke="#2d6a4f" stroke-width="2.5"/>
-                    <text x="460" y="202" fill="#718576" font-size="11" font-weight="600" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">Mar</text>
+                        <!-- Point 5: Mar 88.0% (X: 460, Y: 39.2) -->
+                        <text x="460" y="26" fill="#183324" font-size="11" font-weight="700" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">88.0%</text>
+                        <circle cx="460" cy="39.2" r="4.5" fill="#ffffff" stroke="#2d6a4f" stroke-width="2.5"/>
+                        <text x="460" y="202" fill="#718576" font-size="11" font-weight="600" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">Mar</text>
 
-                    <!-- Point 6: Apr 87.5% (X: 560, Y: 40) with Green Active Badge -->
-                    <rect x="536" y="16" width="48" height="18" rx="9" fill="#1c4b32"/>
-                    <text x="560" y="29" fill="#ffffff" font-size="10" font-weight="800" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">87.5%</text>
-                    <circle cx="560" cy="40" r="5" fill="#ffffff" stroke="#1c4b32" stroke-width="3"/>
-                    <text x="560" y="202" fill="#1c4b32" font-size="11" font-weight="700" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">Apr</text>
+                        <!-- Point 6: Apr 87.5% (X: 560, Y: 40) with Green Active Badge -->
+                        <rect x="536" y="16" width="48" height="18" rx="9" fill="#1c4b32"/>
+                        <text x="560" y="29" fill="#ffffff" font-size="10" font-weight="800" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">87.5%</text>
+                        <circle cx="560" cy="40" r="5" fill="#ffffff" stroke="#1c4b32" stroke-width="3"/>
+                        <text x="560" y="202" fill="#1c4b32" font-size="11" font-weight="700" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">Apr</text>
+                    </g>
                 </svg>
             </div>
 
         </div>
 
-        <!-- Right: Overall Average Donut Gauge & Distribution Card -->
-        <div style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 22px; padding: 26px 28px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-around; flex-wrap: wrap; gap: 20px;">
+        <!-- Right: Overall Average Donut Gauge (Radius 75) & Distribution Card -->
+        <div style="background: #ffffff; border: 1px solid #e5ece6; border-radius: 22px; padding: 24px 26px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-around; flex-wrap: wrap; gap: 20px;">
             
-            <!-- Circular Donut Gauge -->
-            <div style="position: relative; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                <svg width="120" height="120" viewBox="0 0 120 120">
-                    <circle cx="60" cy="60" r="48" stroke="#e2ece4" stroke-width="8.5" fill="none" />
-                    <circle cx="60" cy="60" r="48" stroke="#2d6a4f" stroke-width="8.5" stroke-linecap="round" fill="none"
-                            stroke-dasharray="301.59" 
+            <!-- Circular Donut Gauge (Exact Radius = 75) -->
+            <div style="position: relative; width: 170px; height: 170px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <svg width="170" height="170" viewBox="0 0 170 170" style="display: block;">
+                    <!-- Background circle track (r=75) -->
+                    <circle cx="85" cy="85" r="75" stroke="#e2ece4" stroke-width="10" fill="none" />
+                    <!-- Foreground progress ring (r=75) -->
+                    <circle cx="85" cy="85" r="75" stroke="#2d6a4f" stroke-width="10" stroke-linecap="round" fill="none"
+                            stroke-dasharray="471.24" 
                             stroke-dashoffset="<?= $dashOffset ?>"
                             style="transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dashoffset 0.6s ease;" />
                 </svg>
-                <div style="position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-                    <span style="font-size: 1.45rem; font-weight: 800; color: #183324; font-variant-numeric: tabular-nums; line-height: 1;">
+                <div style="position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; pointer-events: none;">
+                    <span style="font-size: 1.7rem; font-weight: 800; color: #183324; font-variant-numeric: tabular-nums; line-height: 1;">
                         <?= number_format($avg, 1) ?>%
                     </span>
-                    <span style="font-size: 0.65rem; font-weight: 600; color: #718576; text-transform: capitalize; margin-top: 4px;">
+                    <span style="font-size: 0.72rem; font-weight: 600; color: #718576; text-transform: capitalize; margin-top: 6px; line-height: 1.25;">
                         Overall<br>Average
                     </span>
                 </div>
@@ -706,26 +712,147 @@ $low = $lowestScore ?? ['score' => 72.0, 'subject' => 'Ethical Hacking'];
 <!-- JAVASCRIPT INTERACTIONS                              -->
 <!-- ==================================================== -->
 <script>
+// Dynamic Dataset for Performance Trend (6m, 1y, all)
+window.__TREND_DATA__ = <?= json_encode($trendMonths ?? [
+    '6m' => [
+        ['month' => 'Nov', 'score' => 76.0],
+        ['month' => 'Dec', 'score' => 80.5],
+        ['month' => 'Jan', 'score' => 85.0],
+        ['month' => 'Feb', 'score' => 82.0],
+        ['month' => 'Mar', 'score' => 88.0],
+        ['month' => 'Apr', 'score' => 87.5],
+    ],
+    '1y' => [
+        ['month' => 'May', 'score' => 74.0],
+        ['month' => 'Jun', 'score' => 75.5],
+        ['month' => 'Jul', 'score' => 78.0],
+        ['month' => 'Aug', 'score' => 82.0],
+        ['month' => 'Sep', 'score' => 84.5],
+        ['month' => 'Oct', 'score' => 83.0],
+        ['month' => 'Nov', 'score' => 76.0],
+        ['month' => 'Dec', 'score' => 80.5],
+        ['month' => 'Jan', 'score' => 85.0],
+        ['month' => 'Feb', 'score' => 82.0],
+        ['month' => 'Mar', 'score' => 88.0],
+        ['month' => 'Apr', 'score' => 87.5],
+    ],
+    'all' => [
+        ['month' => 'Term 1', 'score' => 75.0],
+        ['month' => 'Term 2', 'score' => 79.5],
+        ['month' => 'Term 3', 'score' => 83.0],
+        ['month' => 'Term 4', 'score' => 85.5],
+        ['month' => 'Term 5', 'score' => 88.0],
+        ['month' => 'Term 6', 'score' => 87.5],
+    ],
+], JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+
+// Compute smooth Catmull-Rom to Cubic Bézier spline path
+function computeSplinePath(pts) {
+    if (!pts || pts.length === 0) return '';
+    if (pts.length === 1) return `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+
+    let path = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+        const p0 = i > 0 ? pts[i - 1] : pts[i];
+        const p1 = pts[i];
+        const p2 = pts[i + 1];
+        const p3 = i < pts.length - 2 ? pts[i + 2] : p2;
+
+        const cp1x = p1.x + (p2.x - p0.x) / 6;
+        const cp1y = p1.y + (p2.y - p0.y) / 6;
+
+        const cp2x = p2.x - (p3.x - p1.x) / 6;
+        const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+        path += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+    }
+    return path;
+}
+
+// Dynamically Render Performance Trend Chart (Spline, Area, Points, Values, and Bottom X-Axis Months)
+function renderTrendChart(period) {
+    const rawData = window.__TREND_DATA__ || {};
+    const items = rawData[period] || rawData['6m'] || [];
+    if (!items.length) return;
+
+    const count = items.length;
+    const isDense = count > 8; // e.g. 1 Year (12 months)
+    const startX = isDense ? 52 : 60;
+    const endX = isDense ? 568 : 560;
+    const stepX = count > 1 ? (endX - startX) / (count - 1) : 0;
+
+    const points = items.map((item, idx) => {
+        const x = startX + idx * stepX;
+        const y = 180 - (item.score / 100) * 160;
+        return { x, y, month: item.month, score: item.score };
+    });
+
+    const linePathD = computeSplinePath(points);
+    const areaPathD = linePathD + ` L ${points[points.length - 1].x.toFixed(1)} 180 L ${points[0].x.toFixed(1)} 180 Z`;
+
+    const pathLine = document.getElementById('trendLinePath');
+    const pathArea = document.getElementById('trendAreaPath');
+    if (pathLine) pathLine.setAttribute('d', linePathD);
+    if (pathArea) pathArea.setAttribute('d', areaPathD);
+
+    const group = document.getElementById('trendDynamicGroup');
+    if (!group) return;
+
+    const scoreFontSize = isDense ? 8.5 : 11;
+    const monthFontSize = isDense ? 9.5 : (count <= 6 && items[0].month.includes('Term') ? 10 : 11);
+    const circleRadius = isDense ? 3.5 : 4.5;
+    const circleStroke = isDense ? 2 : 2.5;
+
+    let svgContent = '';
+    points.forEach((p, idx) => {
+        const isLast = (idx === points.length - 1);
+        const x = p.x.toFixed(1);
+        const y = p.y.toFixed(1);
+        const scoreStr = Number(p.score).toFixed(1) + '%';
+
+        if (isLast) {
+            const badgeW = isDense ? 42 : 48;
+            const badgeH = isDense ? 16 : 18;
+            const badgeRx = badgeH / 2;
+            const badgeX = (p.x - badgeW / 2).toFixed(1);
+            const badgeY = (p.y - (isDense ? 20 : 24)).toFixed(1);
+            const badgeTextY = (p.y - (isDense ? 9 : 11)).toFixed(1);
+
+            svgContent += `
+                <g class="trend-point trend-point-active">
+                    <rect x="${badgeX}" y="${badgeY}" width="${badgeW}" height="${badgeH}" rx="${badgeRx}" fill="#1c4b32"/>
+                    <text x="${x}" y="${badgeTextY}" fill="#ffffff" font-size="${isDense ? 9 : 10}" font-weight="800" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">${scoreStr}</text>
+                    <circle cx="${x}" cy="${y}" r="${isDense ? 4 : 5}" fill="#ffffff" stroke="#1c4b32" stroke-width="${isDense ? 2.5 : 3}"/>
+                    <text x="${x}" y="202" fill="#1c4b32" font-size="${monthFontSize}" font-weight="700" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">${p.month}</text>
+                </g>
+            `;
+        } else {
+            const textY = (p.y - (isDense ? 9 : 12)).toFixed(1);
+            svgContent += `
+                <g class="trend-point">
+                    <text x="${x}" y="${textY}" fill="#183324" font-size="${scoreFontSize}" font-weight="700" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">${scoreStr}</text>
+                    <circle cx="${x}" cy="${y}" r="${circleRadius}" fill="#ffffff" stroke="#2d6a4f" stroke-width="${circleStroke}"/>
+                    <text x="${x}" y="202" fill="#718576" font-size="${monthFontSize}" font-weight="600" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">${p.month}</text>
+                </g>
+            `;
+        }
+    });
+
+    group.innerHTML = svgContent;
+}
+
 // Switch Period on Performance Trend
 function switchTrendPeriod(period, btn) {
     document.querySelectorAll('.trend-pill-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
 
-    // Smooth update of trend graph
-    const pathLine = document.getElementById('trendLinePath');
-    const pathArea = document.getElementById('trendAreaPath');
-
-    if (period === '1y') {
-        if (pathLine) pathLine.setAttribute('d', 'M60 62 Q110 50, 160 48 T260 40 T360 44 T460 36 T560 40');
-        if (pathArea) pathArea.setAttribute('d', 'M60 180 L60 62 Q110 50, 160 48 T260 40 T360 44 T460 36 T560 40 L560 180 Z');
-    } else if (period === 'all') {
-        if (pathLine) pathLine.setAttribute('d', 'M60 68 Q110 56, 160 50 T260 42 T360 40 T460 38 T560 40');
-        if (pathArea) pathArea.setAttribute('d', 'M60 180 L60 68 Q110 56, 160 50 T260 42 T360 40 T460 38 T560 40 L560 180 Z');
-    } else {
-        if (pathLine) pathLine.setAttribute('d', 'M60 58.4 Q110 54, 160 51.2 T260 44 T360 48.8 T460 39.2 T560 40');
-        if (pathArea) pathArea.setAttribute('d', 'M60 180 L60 58.4 Q110 54, 160 51.2 T260 44 T360 48.8 T460 39.2 T560 40 L560 180 Z');
-    }
+    renderTrendChart(period);
 }
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    renderTrendChart('6m');
+});
 
 // Open Exam Assessment Modal
 function openExamModal(data) {
