@@ -90,39 +90,45 @@ class CareerController
 
         $db = Database::getConnection();
 
-        $sql = "SELECT * FROM student_projects WHERE status = 'open' OR status = 'in_progress'";
+        $sql = "SELECT * FROM student_projects WHERE 1=1";
         $params = [];
         if ($search !== '') {
             $sql .= " AND (company_name LIKE :s OR title LIKE :s OR skills LIKE :s OR description LIKE :s)";
             $params['s'] = '%' . $search . '%';
         }
-        $sql .= " ORDER BY id ASC";
+        $sql .= " ORDER BY 
+            CASE status 
+                WHEN 'open' THEN 1 
+                WHEN 'in_progress' THEN 2 
+                ELSE 3 
+            END ASC, 
+            id ASC";
 
         $stmt = $db->prepare($sql);
         $stmt->execute($params);
         $rawProjects = $stmt->fetchAll();
 
         $projects = array_map(function ($pr) {
+            $status = strtolower($pr['status'] ?? 'open');
             $typeLower = strtolower($pr['project_type'] ?? '');
             $titleLower = strtolower($pr['title'] ?? '');
 
-            if (str_contains($typeLower, 'cyber') || str_contains($titleLower, 'pentest') || str_contains($titleLower, 'security')) {
-                $category = 'cybersecurity';
-                $catLabel = 'Cybersecurity';
+            // Category: current vs past
+            $category = ($status === 'completed') ? 'past' : 'current';
+            $categoryLabel = ($status === 'completed') ? 'Past' : 'Current';
+
+            if (str_contains($typeLower, 'cyber') || str_contains($titleLower, 'pentest') || str_contains($titleLower, 'security') || str_contains($titleLower, 'siem')) {
                 $icon = 'shield';
             } elseif (str_contains($typeLower, 'cloud') || str_contains($titleLower, 'kubernetes') || str_contains($titleLower, 'devops') || str_contains($typeLower, 'practical')) {
-                $category = 'cloud';
-                $catLabel = 'Cloud & DevOps';
                 $icon = 'cloud';
             } else {
-                $category = 'capstone';
-                $catLabel = 'Capstone';
                 $icon = 'database';
             }
 
             $pr['category'] = $category;
-            $pr['category_label'] = $catLabel;
+            $pr['category_label'] = $categoryLabel;
             $pr['icon_type'] = $icon;
+            $pr['is_past'] = ($category === 'past');
             return $pr;
         }, $rawProjects);
 

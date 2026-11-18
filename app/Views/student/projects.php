@@ -1,7 +1,7 @@
 <?php
 /**
  * Student Industry Projects & Capstones Desk
- * Matches Kalavanta Edutech openings design structure with category filter pills, sort bar, custom mint icons, and application modal.
+ * Matches Kalavanta Edutech openings design structure with All, Current, Past filter pills, sort bar, custom mint icons, and application modal.
  */
 ?>
 
@@ -13,19 +13,16 @@
         <!-- Filter Pills & Sort Bar -->
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 22px;">
             
-            <!-- Filter Pills (All, Capstone, Cloud & DevOps, Cybersecurity) -->
+            <!-- Filter Pills (All, Current, Past) -->
             <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;" id="projectsFilterGroup">
                 <button type="button" class="filter-pill active" data-category="all" onclick="filterProjectCategory('all', this)">
                     All
                 </button>
-                <button type="button" class="filter-pill" data-category="capstone" onclick="filterProjectCategory('capstone', this)">
-                    Capstone
+                <button type="button" class="filter-pill" data-category="current" onclick="filterProjectCategory('current', this)">
+                    Current
                 </button>
-                <button type="button" class="filter-pill" data-category="cloud" onclick="filterProjectCategory('cloud', this)">
-                    Cloud & DevOps
-                </button>
-                <button type="button" class="filter-pill" data-category="cybersecurity" onclick="filterProjectCategory('cybersecurity', this)">
-                    Cybersecurity
+                <button type="button" class="filter-pill" data-category="past" onclick="filterProjectCategory('past', this)">
+                    Past
                 </button>
             </div>
 
@@ -57,9 +54,10 @@
             <?php else: ?>
                 <?php foreach ($projects as $index => $pr): ?>
                     <?php
-                        $cat = $pr['category'] ?? 'capstone';
+                        $cat = $pr['category'] ?? 'current';
                         $iconType = $pr['icon_type'] ?? 'database';
-                        $catLabel = $pr['category_label'] ?? 'Capstone';
+                        $isPast = !empty($pr['is_past']) || $cat === 'past';
+                        $catLabel = $isPast ? 'Past / Completed' : 'Current Project';
                         // Parse duration weeks for sorting
                         preg_match('/(\d+)\s*Week/i', $pr['engagement'] ?? '', $durMatch);
                         $weeks = !empty($durMatch[1]) ? (int)$durMatch[1] : 10;
@@ -99,9 +97,14 @@
 
                             <!-- Details Column -->
                             <div style="flex: 1; min-width: 0;">
-                                <h3 style="font-size: 1.15rem; font-weight: 800; color: #183324; margin: 0 0 4px 0; letter-spacing: -0.2px;">
-                                    <?= htmlspecialchars($pr['title']) ?>
-                                </h3>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px;">
+                                    <h3 style="font-size: 1.15rem; font-weight: 800; color: #183324; margin: 0; letter-spacing: -0.2px;">
+                                        <?= htmlspecialchars($pr['title']) ?>
+                                    </h3>
+                                    <?php if ($isPast): ?>
+                                        <span style="font-size: 0.68rem; font-weight: 700; background: #e2ece4; color: #2d6a4f; padding: 2px 8px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.5px;">Past Project</span>
+                                    <?php endif; ?>
+                                </div>
                                 <p style="font-size: 0.88rem; color: #627467; margin: 0 0 10px 0; font-weight: 500; line-height: 1.4;">
                                     <?= htmlspecialchars($pr['description']) ?>
                                 </p>
@@ -115,7 +118,7 @@
                                             <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                                             <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                                         </svg>
-                                        <span><?= htmlspecialchars($pr['company_name']) ?> (<?= htmlspecialchars($catLabel) ?>)</span>
+                                        <span><?= htmlspecialchars($pr['company_name']) ?> (<?= htmlspecialchars($pr['project_type']) ?>)</span>
                                     </span>
 
                                     <!-- Location Tag with Pin -->
@@ -149,24 +152,44 @@
 
                         </div>
 
-                        <!-- Right: Apply Now Pill Button -->
+                        <!-- Right: Action Button -->
                         <div style="flex-shrink: 0;">
-                            <button type="button" 
-                                    class="project-btn-pill"
-                                    id="projectBtn-<?= (int)$pr['id'] ?>"
-                                    onclick="openProjectModal(<?= htmlspecialchars(json_encode([
-                                        'id' => (int)$pr['id'],
-                                        'title' => $pr['title'],
-                                        'company' => $pr['company_name'],
-                                        'type' => $pr['project_type'],
-                                        'location' => $pr['location'],
-                                        'engagement' => $pr['engagement'],
-                                        'skills' => $pr['skills'] ?? '',
-                                        'email' => $pr['contact_email'] ?? ''
-                                    ])) ?>)">
-                                <span>Join Project</span>
-                                <span style="font-size: 1.05rem; line-height: 1;">&rarr;</span>
-                            </button>
+                            <?php if ($isPast): ?>
+                                <button type="button" 
+                                        class="project-btn-pill applied"
+                                        onclick="openProjectModal(<?= htmlspecialchars(json_encode([
+                                            'id' => (int)$pr['id'],
+                                            'title' => $pr['title'],
+                                            'company' => $pr['company_name'],
+                                            'type' => $pr['project_type'],
+                                            'location' => $pr['location'],
+                                            'engagement' => $pr['engagement'],
+                                            'skills' => $pr['skills'] ?? '',
+                                            'email' => $pr['contact_email'] ?? '',
+                                            'is_past' => true
+                                        ])) ?>)">
+                                    <span>Archived</span>
+                                    <span style="font-weight: 800;">✓</span>
+                                </button>
+                            <?php else: ?>
+                                <button type="button" 
+                                        class="project-btn-pill"
+                                        id="projectBtn-<?= (int)$pr['id'] ?>"
+                                        onclick="openProjectModal(<?= htmlspecialchars(json_encode([
+                                            'id' => (int)$pr['id'],
+                                            'title' => $pr['title'],
+                                            'company' => $pr['company_name'],
+                                            'type' => $pr['project_type'],
+                                            'location' => $pr['location'],
+                                            'engagement' => $pr['engagement'],
+                                            'skills' => $pr['skills'] ?? '',
+                                            'email' => $pr['contact_email'] ?? '',
+                                            'is_past' => false
+                                        ])) ?>)">
+                                    <span>Join Project</span>
+                                    <span style="font-size: 1.05rem; line-height: 1;">&rarr;</span>
+                                </button>
+                            <?php endif; ?>
                         </div>
 
                     </div>
@@ -178,8 +201,8 @@
                 <div style="width: 50px; height: 50px; border-radius: 12px; background: #eaf5ee; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; color: #2d6a4f;">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 </div>
-                <p style="font-size: 1rem; font-weight: 700; color: #183324; margin: 0 0 4px 0;">No projects in this track</p>
-                <p style="font-size: 0.84rem; color: #627467; margin: 0 0 16px 0;">Switch to another track to view more engineering briefs.</p>
+                <p style="font-size: 1rem; font-weight: 700; color: #183324; margin: 0 0 4px 0;">No projects in this view</p>
+                <p style="font-size: 0.84rem; color: #627467; margin: 0 0 16px 0;">Switch to All or another filter to view project briefs.</p>
                 <button type="button" onclick="filterProjectCategory('all', document.querySelector('#projectsFilterGroup .filter-pill[data-category=\'all\']'))" style="background: #1c4b32; color: #ffffff; border: none; border-radius: 9999px; padding: 8px 20px; font-size: 0.84rem; font-weight: 700; cursor: pointer;">
                     View All Projects
                 </button>
@@ -268,7 +291,7 @@
         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
         <polyline points="22 4 12 14.01 9 11.01"></polyline>
     </svg>
-    <span id="projectToastMessage" style="font-size: 0.88rem; font-weight: 600;">Project brief inquiry submitted successfully!</span>
+    <span id="projectToastMessage" style="font-size: 0.88rem; font-weight: 600;">Project application submitted successfully!</span>
 </div>
 
 <style>
@@ -438,8 +461,15 @@ function openProjectModal(projectData) {
     activeProject = projectData;
     document.getElementById('modalProjectId').value = projectData.id;
     document.getElementById('modalProjectEmail').value = projectData.email || '';
-    document.getElementById('modalProjectTitle').textContent = 'Join ' + projectData.title;
+    document.getElementById('modalProjectTitle').textContent = (projectData.is_past ? 'Project Archive: ' : 'Join ') + projectData.title;
     document.getElementById('modalProjectMeta').textContent = projectData.company + ' • ' + projectData.engagement + ' • ' + projectData.location;
+
+    const submitBtn = document.getElementById('submitProjectBtn');
+    if (projectData.is_past) {
+        submitBtn.style.display = 'none';
+    } else {
+        submitBtn.style.display = 'inline-flex';
+    }
     
     const backdrop = document.getElementById('projectModalBackdrop');
     backdrop.style.display = 'flex';
